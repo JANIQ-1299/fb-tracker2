@@ -15,7 +15,13 @@ import { workspaceAuthRouter } from "./routes/workspaceAuth.js";
 import { superAdminAuthRouter } from "./routes/superAdminAuth.js";
 import { superAdminRouter } from "./routes/superAdmin.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
-import { apiRateLimiter, authRateLimiter, webhookRateLimiter } from "./middleware/rateLimit.js";
+import {
+  apiRateLimiter,
+  authRateLimiter,
+  webhookRateLimiter,
+  workspaceAuthRateLimiter,
+  superAdminAuthRateLimiter,
+} from "./middleware/rateLimit.js";
 
 // بُني كدالة منفصلة عن index.ts حتى يمكن استيراده في الاختبارات (supertest)
 // بدون تشغيل app.listen() أو جدولة cron jobs الفعلية.
@@ -44,8 +50,8 @@ export function buildApp() {
   app.use("/api/dashboard", apiRateLimiter, dashboardRouter);
 
   // ---- Multi-Tenant: دخول مستخدمي الـWorkspaces + طبقة Super Admin (منفصلة تمامًا) ----
-  app.use("/api/auth/user", authRateLimiter, workspaceAuthRouter);
-  app.use("/api/superadmin/auth", authRateLimiter, superAdminAuthRouter);
+  app.use("/api/auth/user", workspaceAuthRateLimiter, workspaceAuthRouter);
+  app.use("/api/superadmin/auth", superAdminAuthRateLimiter, superAdminAuthRouter);
   app.use("/api/superadmin", apiRateLimiter, superAdminRouter);
 
   app.use(notFoundHandler);
