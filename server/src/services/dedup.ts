@@ -57,3 +57,38 @@ export async function detectDuplicate(params: {
 
   return { isDuplicate: false };
 }
+
+/**
+ * نفس منطق detectDuplicate أعلاه (نافذة زمنية + رقم هاتف موحّد)، لكن على جدول Order بدل Lead،
+ * ومقيّد بـworkspaceId صراحة (عزل بين المستأجرين). يُستخدم عند استيراد ملفات Excel لاكتشاف
+ * الطلبات المكررة مقابل الطلبات السابقة المحفوظة فعليًا في نفس الـWorkspace (وليس فقط داخل
+ * الملف الحالي - تلك مقارنة منفصلة تتم داخل نفس دفعة الاستيراد في importProcessor.ts).
+ */
+export async function detectOrderDuplicate(params: {
+  workspaceId: string;
+  normalizedPhone: string | null;
+  createdAt: Date;
+  windowHours?: number;
+}): Promise<{ isDuplicate: boolean; duplicateOfId?: string; reason?: string }> {
+  if (!params.normalizedPhone) return { isDuplicate: false };
+  const windowHours = params.windowHours ?? DEFAULT_WINDOW_HOURS;
+  const windowStart = new Date(params.createdAt.getTime() - windowHours * 60 * 60 * 1000);
+
+  const existing = await prisma.order.findFirst({
+    where: {
+      workspaceId: params.workspaceId,
+      normalizedPhone: params.normalizedPhone,
+      isDuplicate: false,
+      createdAt: { gte: windowStart },
+    },
+    orderBy: { createdAt: "asc" },
+  });
+  if (existing) {
+    return {
+      isDuplicate: true,
+      duplicateOfId: existing.id,
+      reason: `نفس رقم الهاتف الموحّد (${params.normalizedPhone}) لطلب سابق خلال ${windowHours} ساعة`,
+    };
+  }
+  return { isDuplicate: false };
+}

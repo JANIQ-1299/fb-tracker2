@@ -536,11 +536,15 @@ model ImportedFile {
   filename       String
   uploadedBy     String // user id
   uploadedAt     DateTime @default(now())
-  rowCount       Int      @default(0)
+  rowCount       Int      @default(0) // إجمالي الصفوف غير الفارغة التي قُرئت من الملف
+  acceptedCount  Int      @default(0) // صفوف صحيحة تم استيرادها فعليًا (تشمل المكرر إن اختير استيراده مع علامة)
+  rejectedCount  Int      @default(0) // صفوف ناقصة أو بها خطأ - لم تُستورد
+  duplicateCount Int      @default(0) // صفوف مكررة اكتُشفت (سواء استُوردت بعلامة أو تم تجاهلها)
+  // محجوزان لمرحلة محرك المطابقة القادمة - لا علاقة لهما باستيراد Excel نفسه
   matchedCount   Int      @default(0)
   unmatchedCount Int      @default(0)
   status         String   @default("PROCESSING") // PROCESSING | DONE | FAILED
-  errorSummary   String?
+  errorSummary   String? // JSON: تفاصيل صفوف الأخطاء/الناقصة/المكررة للمراجعة اللاحقة
 
   workspace Workspace @relation(fields: [workspaceId], references: [id])
   orders    Order[]
@@ -569,6 +573,8 @@ model Order {
   campaignIdRaw   String?
   leadIdRaw       String?
   sourceRaw       String?
+  externalOrderId String? // رقم الطلب كما يظهر في ملف Excel المصدر - محجوز لاستخدامه لاحقًا في منع التكرار
+  employeeName    String? // اسم الموظف الذي أدخل الطلب، إن وُجد عمود له في الملف
   isDuplicate     Boolean   @default(false)
   duplicateOfId   String?
   duplicateReason String?

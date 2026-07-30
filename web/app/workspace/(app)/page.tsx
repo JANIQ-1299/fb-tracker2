@@ -77,8 +77,7 @@ export default function WorkspaceHome() {
       <div className="card" style={{ marginTop: 8 }}>
         <div className="label">ربط حساب Meta</div>
         <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
-          اربط صفحتك وحسابك الإعلاني عبر Meta، وزامن الحملات والإعلانات والفيديوهات. رفع ملفات
-          الطلبات ومحرك المطابقة ضمن مرحلة قادمة.
+          اربط صفحتك وحسابك الإعلاني عبر Meta، وزامن الحملات والإعلانات والفيديوهات.
         </p>
         <div style={{ display: "flex", gap: 10 }}>
           <button className="btn" onClick={connectMeta}>
@@ -88,6 +87,17 @@ export default function WorkspaceHome() {
             إدارة اتصالات Meta الحالية
           </a>
         </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="label">استيراد الطلبات</div>
+        <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
+          ارفع ملف Excel/CSV يحتوي طلباتك، وعاين واربط الأعمدة قبل الاستيراد. مطابقة الطلبات
+          بالإعلانات ضمن مرحلة قادمة.
+        </p>
+        <a className="btn" href="/workspace/imports" style={{ display: "inline-flex", alignItems: "center" }}>
+          استيراد الطلبات
+        </a>
       </div>
     </main>
   );

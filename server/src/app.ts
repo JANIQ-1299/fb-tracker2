@@ -17,6 +17,7 @@ import { superAdminRouter } from "./routes/superAdmin.js";
 import { metaOAuthRouter } from "./routes/metaOAuth.js";
 import { metaConnectionsRouter } from "./routes/metaConnections.js";
 import { metaSyncRouter } from "./routes/metaSync.js";
+import { importsRouter } from "./routes/imports.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import {
   apiRateLimiter,
@@ -63,6 +64,9 @@ export function buildApp() {
   app.use("/api/meta/oauth", apiRateLimiter, metaOAuthRouter);
   app.use("/api/meta/connections", apiRateLimiter, metaConnectionsRouter);
   app.use("/api/meta/sync", apiRateLimiter, metaSyncRouter);
+
+  // ---- استيراد ملفات الطلبات (Excel/CSV) - لا يُنشئ OrderAttribution إطلاقًا في هذه المرحلة ----
+  app.use("/api/imports", apiRateLimiter, importsRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
