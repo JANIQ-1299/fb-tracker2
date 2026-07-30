@@ -1,0 +1,630 @@
+// Prisma schema — Meta Order Attribution (Multi-Tenant)
+// منذ نسخة Multi-Tenant: PostgreSQL هي قاعدة البيانات الوحيدة المدعومة (راجع DECISIONS.md).
+// كل بيانات Meta (صفحات/حسابات/حملات/عملاء محتملين...) مربوطة بـ workspaceId لعزل كل مستأجر.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// المستأجرون (Tenancy) والمستخدمون
+// ============================================================
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users             User[]
+  metaConnections   MetaConnection[]
+  subscription      WorkspaceSubscription?
+  licenseDevices    LicenseDevice[]
+  businesses        Business[]
+  pages             Page[]
+  adAccounts        AdAccount[]
+  campaigns         Campaign[]
+  adSets            AdSet[]
+  ads               Ad[]
+  creatives         Creative[]
+  leads             Lead[]
+  webhookEvents     WebhookEvent[]
+  importedFiles     ImportedFile[]
+  orders            Order[]
+  orderAttributions OrderAttribution[]
+  mappingRules      MappingRule[]
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         String    @default("OWNER") // OWNER | MEMBER
+  workspaceId  String
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  workspace      Workspace       @relation(fields: [workspaceId], references: [id])
+  licenseDevices LicenseDevice[]
+
+  @@index([workspaceId])
+}
+
+// ============================================================
+// الترخيص والاشتراكات (Super Admin control plane)
+// ============================================================
+
+model SuperAdmin {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  totpSecret   String // سر TOTP لمصادقة ثنائية إلزامية، لا يوجد Super Admin بدون 2FA
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  actions AdminAction[]
+}
+
+model SubscriptionPlan {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  maxPages      Int      @default(1)
+  maxAdAccounts Int      @default(1)
+  maxUsers      Int      @default(1)
+  createdAt     DateTime @default(now())
+
+  subscriptions WorkspaceSubscription[]
+}
+
+model WorkspaceSubscription {
+  id               String    @id @default(cuid())
+  workspaceId      String    @unique
+  planId           String?
+  status           String    @default("ACTIVE") // ACTIVE | SUSPENDED | EXPIRED | BLOCKED
+  startsAt         DateTime  @default(now())
+  expiresAt        DateTime?
+  suspendedAt      DateTime?
+  suspensionReason String?
+  // حدود قد تُخصَّص لهذا الـWorkspace فوق قيم الخطة الافتراضية
+  maxPages         Int       @default(1)
+  maxAdAccounts    Int       @default(1)
+  maxUsers         Int       @default(1)
+  createdBy        String? // super admin id
+  updatedBy        String? // super admin id
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  workspace Workspace         @relation(fields: [workspaceId], references: [id])
+  plan      SubscriptionPlan? @relation(fields: [planId], references: [id])
+
+  @@index([status])
+}
+
+model AdminAction {
+  id                String   @id @default(cuid())
+  superAdminId      String
+  action            String // SUSPEND_WORKSPACE | ACTIVATE_WORKSPACE | BLOCK_WORKSPACE | EXTEND_SUBSCRIPTION | SET_LIMITS | TOGGLE_MAINTENANCE | ...
+  targetWorkspaceId String?
+  details           String? // JSON string (سبب، قيم قبل/بعد، إلخ)
+  ipAddress         String?
+  createdAt         DateTime @default(now())
+
+  superAdmin SuperAdmin @relation(fields: [superAdminId], references: [id])
+
+  @@index([targetWorkspaceId])
+  @@index([createdAt])
+}
+
+model LicenseDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  workspaceId String
+  deviceInfo  String? // User-Agent مختصر
+  ipAddress   String?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  revoked     Boolean  @default(false)
+
+  user      User      @relation(fields: [userId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+// مفتاح `system_state` بقيمة SYSTEM_ACTIVE | MAINTENANCE_MODE يُخزَّن في AppSetting الموجود أدناه.
+
+// ============================================================
+// اتصال Meta (OAuth) لكل Workspace
+// ============================================================
+
+model MetaConnection {
+  id                   String    @id @default(cuid())
+  workspaceId          String
+  metaUserId           String?
+  accessTokenEncrypted String // AES-256-GCM ciphertext (base64) — لا يُعاد إرساله للواجهة أبدًا
+  tokenIv              String
+  tokenTag             String
+  tokenExpiresAt       DateTime?
+  scopes               String?
+  status               String    @default("CONNECTED") // CONNECTED | EXPIRED | REVOKED
+  connectedAt          DateTime  @default(now())
+  lastCheckedAt        DateTime?
+  lastSyncAt           DateTime?
+  createdBy            String? // user id
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  workspace  Workspace   @relation(fields: [workspaceId], references: [id])
+  pages      Page[]
+  adAccounts AdAccount[]
+
+  @@index([workspaceId])
+}
+
+// ============================================================
+// بيانات Meta المُزامنة (Business/Page/AdAccount/Campaign/AdSet/Ad/Creative)
+// ============================================================
+
+model Business {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  metaBusinessId String
+  name           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  workspace  Workspace   @relation(fields: [workspaceId], references: [id])
+  pages      Page[]
+  adAccounts AdAccount[]
+
+  @@unique([workspaceId, metaBusinessId])
+}
+
+model Page {
+  id               String   @id @default(cuid())
+  workspaceId      String
+  metaConnectionId String?
+  metaPageId       String
+  name             String
+  businessId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id])
+  metaConnection    MetaConnection?    @relation(fields: [metaConnectionId], references: [id])
+  business          Business?          @relation(fields: [businessId], references: [id])
+  leads             Lead[]
+  orderAttributions OrderAttribution[]
+
+  @@unique([workspaceId, metaPageId])
+}
+
+model AdAccount {
+  id               String   @id @default(cuid())
+  workspaceId      String
+  metaConnectionId String?
+  metaAdAccountId  String
+  name             String
+  currency         String   @default("USD")
+  businessId       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id])
+  metaConnection    MetaConnection?    @relation(fields: [metaConnectionId], references: [id])
+  business          Business?          @relation(fields: [businessId], references: [id])
+  campaigns         Campaign[]
+  orderAttributions OrderAttribution[]
+
+  @@unique([workspaceId, metaAdAccountId])
+}
+
+model Campaign {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  metaCampaignId String
+  name           String
+  adAccountId    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id])
+  adAccount         AdAccount          @relation(fields: [adAccountId], references: [id])
+  adSets            AdSet[]
+  leads             Lead[]
+  insights          InsightSnapshot[]
+  orderAttributions OrderAttribution[]
+
+  @@unique([workspaceId, metaCampaignId])
+}
+
+model AdSet {
+  id          String   @id @default(cuid())
+  workspaceId String
+  metaAdSetId String
+  name        String
+  campaignId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id])
+  campaign          Campaign           @relation(fields: [campaignId], references: [id])
+  ads               Ad[]
+  leads             Lead[]
+  insights          InsightSnapshot[]
+  orderAttributions OrderAttribution[]
+
+  @@unique([workspaceId, metaAdSetId])
+}
+
+model Ad {
+  id          String   @id @default(cuid())
+  workspaceId String
+  metaAdId    String
+  name        String
+  adSetId     String
+  creativeId  String?
+  status      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace            Workspace                @relation(fields: [workspaceId], references: [id])
+  adSet                AdSet                    @relation(fields: [adSetId], references: [id])
+  creative             Creative?                @relation(fields: [creativeId], references: [id])
+  leads                Lead[]
+  insights             InsightSnapshot[]
+  performanceSnapshots AdPerformanceSnapshot[]
+  orderIncrements      DetectedOrderIncrement[]
+  orderAttributions    OrderAttribution[]
+
+  @@unique([workspaceId, metaAdId])
+}
+
+model Creative {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  metaCreativeId String
+  videoId        String?
+  postId         String?
+  reelId         String?
+  thumbnailUrl   String?
+  sourceType     String // e.g. VIDEO, IMAGE, CAROUSEL, EXISTING_POST, ASSET_FEED, UNKNOWN
+  extractionNote String? // reason video/source could not be determined, if applicable
+  rawMetadata    String? // JSON string of the raw creative payload for audit
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  workspace         Workspace          @relation(fields: [workspaceId], references: [id])
+  ads               Ad[]
+  orderAttributions OrderAttribution[]
+
+  @@unique([workspaceId, metaCreativeId])
+}
+
+// ============================================================
+// Lead Ads عبر Webhook (النظام القديم أحادي المستأجر — يبقى كما هو، فقط أُضيف له workspaceId)
+// ============================================================
+
+model Lead {
+  id               String    @id @default(cuid())
+  workspaceId      String
+  metaLeadId       String
+  name             String?
+  phone            String?
+  normalizedPhone  String?
+  email            String?
+  createdAt        DateTime  @default(now()) // record creation time in our DB
+  metaCreatedAt    DateTime? // lead_gen time reported by Meta
+  pageId           String?
+  campaignId       String?
+  adSetId          String?
+  adId             String?
+  creativeId       String?
+  formId           String?
+  formName         String?
+  status           String    @default("جديد")
+  orderValue       Float?
+  submittedOrderAt DateTime?
+  isDuplicate      Boolean   @default(false)
+  duplicateOfId    String?
+  duplicateReason  String?
+  notes            String?
+  rawData          String? // JSON string of raw Meta payload
+  updatedAt        DateTime  @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  page      Page?     @relation(fields: [pageId], references: [id])
+  campaign  Campaign? @relation(fields: [campaignId], references: [id])
+  adSet     AdSet?    @relation(fields: [adSetId], references: [id])
+  ad        Ad?       @relation(fields: [adId], references: [id])
+
+  statusHistory LeadStatusHistory[]
+
+  @@unique([workspaceId, metaLeadId])
+  @@index([normalizedPhone])
+  @@index([email])
+  @@index([status])
+  @@index([campaignId])
+  @@index([adId])
+}
+
+model LeadStatusHistory {
+  id        String   @id @default(cuid())
+  leadId    String
+  oldStatus String?
+  newStatus String
+  changedAt DateTime @default(now())
+  changedBy String // user/admin identifier or "system" / "sheets" / "webhook"
+  source    String // "dashboard" | "sheets" | "webhook" | "api" | "seed"
+
+  lead Lead @relation(fields: [leadId], references: [id])
+
+  @@index([leadId])
+}
+
+model WebhookEvent {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  eventKey     String // idempotency key, e.g. hash(leadgen_id + time)
+  eventType    String
+  receivedAt   DateTime  @default(now())
+  processedAt  DateTime?
+  status       String    @default("PENDING") // PENDING | PROCESSED | FAILED | DUPLICATE
+  rawPayload   String
+  errorMessage String?
+  retryCount   Int       @default(0)
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, eventKey])
+  @@index([status])
+}
+
+model SyncLog {
+  id          String    @id @default(cuid())
+  source      String // "meta_insights" | "google_sheets" | "meta_lead_details"
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  status      String    @default("RUNNING") // RUNNING | SUCCESS | FAILED | PARTIAL
+  details     String?
+
+  @@index([source])
+}
+
+model InsightSnapshot {
+  id            String   @id @default(cuid())
+  date          DateTime // day (Asia/Baghdad) this snapshot covers
+  level         String // "campaign" | "adset" | "ad"
+  campaignId    String?
+  adSetId       String?
+  adId          String?
+  spend         Float    @default(0)
+  impressions   Int      @default(0)
+  reach         Int      @default(0)
+  clicks        Int      @default(0)
+  leadsCount    Int      @default(0)
+  // عدد أحداث "طلب تم إنشاؤه" (onsite_conversion.messaging_order_created_v2) من Marketing API —
+  // مصدر الطلبات الرسمي والوحيد الموثوق لحملات المراسلة (Click-to-Instagram/Messenger) التي لا
+  // تستخدم Lead Ads إطلاقًا. راجع DECISIONS.md #14.
+  ordersCount   Int      @default(0)
+  costPerResult Float?
+  currency      String   @default("USD")
+  fetchedAt     DateTime @default(now())
+
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
+  adSet    AdSet?    @relation(fields: [adSetId], references: [id])
+  ad       Ad?       @relation(fields: [adId], references: [id])
+
+  @@unique([date, level, campaignId, adSetId, adId])
+  @@index([date])
+}
+
+// ---- تتبّع "جديد منذ آخر فحص" (Delta) لطلبات المراسلة، بالإضافة إلى InsightSnapshot الذي
+// يحفظ آخر قيمة فقط. الحقل التراكمي الذي تعيده Meta لليوم الجاري يرتفع مع كل ساعة تمر، لذا
+// نحتاج سجلًا تاريخيًا لكل مزامنة (AdPerformanceSnapshot) لحساب الفرق (DetectedOrderIncrement)
+// بدل مقارنة القيمة الحالية بنفسها. راجع DECISIONS.md.
+
+model SyncRun {
+  id                 String    @id @default(cuid())
+  startedAt          DateTime  @default(now())
+  completedAt        DateTime?
+  status             String    @default("running") // running | success | partial | failed
+  adsProcessed       Int       @default(0)
+  metaOrdersDetected Int       @default(0) // مجموع newMetaOrders المكتشفة خلال هذه الدورة فقط
+  errorMessage       String?
+  createdAt          DateTime  @default(now())
+
+  snapshots  AdPerformanceSnapshot[]
+  increments DetectedOrderIncrement[]
+
+  @@index([startedAt])
+}
+
+model AdPerformanceSnapshot {
+  id             String   @id @default(cuid())
+  adId           String
+  campaignId     String?
+  adSetId        String?
+  creativeId     String?
+  videoId        String?
+  snapshotTime   DateTime @default(now())
+  metaDate       DateTime // اليوم الذي تغطيه بيانات Meta (date_start)، وليس وقت المزامنة
+  spend          Float
+  metaOrderCount Int
+  actionsRaw     String? // JSON كامل لحقل actions للتدقيق
+  syncRunId      String
+  isBaseline     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  ad      Ad      @relation(fields: [adId], references: [id])
+  syncRun SyncRun @relation(fields: [syncRunId], references: [id])
+
+  @@index([adId, metaDate])
+  @@index([syncRunId])
+}
+
+model DetectedOrderIncrement {
+  id            String   @id @default(cuid())
+  adId          String
+  campaignId    String?
+  adSetId       String?
+  creativeId    String?
+  videoId       String?
+  detectedAt    DateTime @default(now())
+  windowStart   DateTime
+  windowEnd     DateTime
+  previousCount Int
+  currentCount  Int
+  newMetaOrders Int // = max(0, currentCount - previousCount)
+  spendDelta    Float
+  snapshotId    String
+  syncRunId     String
+  createdAt     DateTime @default(now())
+
+  ad      Ad      @relation(fields: [adId], references: [id])
+  syncRun SyncRun @relation(fields: [syncRunId], references: [id])
+
+  @@unique([adId, snapshotId]) // Idempotency: لا يمكن تسجيل نفس اللقطة مرتين لنفس الإعلان
+  @@index([detectedAt])
+}
+
+// ============================================================
+// النظام القديم للدخول (Single Admin عبر .env) — يبقى دون حذف
+// ============================================================
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+}
+
+model AppSetting {
+  key   String @id
+  value String
+}
+
+model DailyReport {
+  id           String    @id @default(cuid())
+  reportDate   DateTime // منتصف ليل اليوم المُقرَّر (Asia/Baghdad) الذي يغطيه التقرير
+  generatedAt  DateTime  @default(now()) // أول توليد (23:59)
+  reconciledAt DateTime? // وقت إعادة المطابقة الصباحية (09:00) إن حدثت
+  payload      String // JSON كامل للتقرير (نفس شكل /api/dashboard/last-24-hours تقريبًا)
+  createdAt    DateTime  @default(now())
+
+  @@unique([reportDate])
+}
+
+// ============================================================
+// استيراد الطلبات (Excel/CSV) والمطابقة — النظام الجديد
+// ============================================================
+
+model ImportedFile {
+  id             String   @id @default(cuid())
+  workspaceId    String
+  filename       String
+  uploadedBy     String // user id
+  uploadedAt     DateTime @default(now())
+  rowCount       Int      @default(0)
+  matchedCount   Int      @default(0)
+  unmatchedCount Int      @default(0)
+  status         String   @default("PROCESSING") // PROCESSING | DONE | FAILED
+  errorSummary   String?
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  orders    Order[]
+
+  @@index([workspaceId])
+}
+
+model Order {
+  id              String    @id @default(cuid())
+  workspaceId     String
+  importedFileId  String
+  customerName    String?
+  phone           String?
+  normalizedPhone String?
+  governorate     String?
+  address         String?
+  product         String?
+  price           Float?
+  orderStatus     String?
+  orderDate       DateTime?
+  adNameRaw       String?
+  videoNameRaw    String?
+  campaignNameRaw String?
+  adIdRaw         String?
+  adSetIdRaw      String?
+  campaignIdRaw   String?
+  leadIdRaw       String?
+  sourceRaw       String?
+  isDuplicate     Boolean   @default(false)
+  duplicateOfId   String?
+  duplicateReason String?
+  rawRow          String? // JSON string of the original row for audit
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  workspace    Workspace         @relation(fields: [workspaceId], references: [id])
+  importedFile ImportedFile      @relation(fields: [importedFileId], references: [id])
+  attribution  OrderAttribution?
+
+  @@index([workspaceId])
+  @@index([normalizedPhone])
+  @@index([adIdRaw])
+  @@index([leadIdRaw])
+}
+
+model OrderAttribution {
+  id          String    @id @default(cuid())
+  orderId     String    @unique
+  workspaceId String
+  pageId      String?
+  adAccountId String?
+  campaignId  String?
+  adSetId     String?
+  adId        String?
+  creativeId  String?
+  matchMethod String? // AD_ID | LEAD_ID | CAMPAIGN_ADSET | NAME | PHONE | TIME | MANUAL
+  matchStatus String    @default("UNMATCHED") // EXACT | PROBABLE | MANUAL | UNMATCHED
+  confidence  Float     @default(0)
+  matchedAt   DateTime?
+  matchedBy   String? // user id إن كانت مطابقة يدوية
+
+  order     Order      @relation(fields: [orderId], references: [id])
+  workspace Workspace  @relation(fields: [workspaceId], references: [id])
+  page      Page?      @relation(fields: [pageId], references: [id])
+  adAccount AdAccount? @relation(fields: [adAccountId], references: [id])
+  campaign  Campaign?  @relation(fields: [campaignId], references: [id])
+  adSet     AdSet?     @relation(fields: [adSetId], references: [id])
+  ad        Ad?        @relation(fields: [adId], references: [id])
+  creative  Creative?  @relation(fields: [creativeId], references: [id])
+
+  @@index([workspaceId])
+  @@index([matchStatus])
+  @@index([adId])
+}
+
+model MappingRule {
+  id                 String   @id @default(cuid())
+  workspaceId        String
+  ruleType           String // AD_NAME_ALIAS | VIDEO_NAME_ALIAS | PHONE_TO_AD | ...
+  matchKey           String // القيمة الملاحظة في ملفات Excel (اسم الإعلان الخام، الهاتف، ...)
+  adId               String?
+  campaignId         String?
+  createdFromOrderId String?
+  createdAt          DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, ruleType, matchKey])
+}

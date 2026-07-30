@@ -1,0 +1,278 @@
+// نسخة مطابقة لمخطط SQLite القديم (أحادي المستأجر)، تُستخدم فقط لتوليد Prisma Client
+// منفصل يقرأ منها سكربت الهجرة (scripts/migrate-sqlite-to-postgres.ts) لمرة واحدة.
+// لا علاقة لهذا الملف بتشغيل الخادم العادي (الذي يستخدم prisma/schema.prisma على Postgres).
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.legacy-sqlite-client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("LEGACY_SQLITE_DATABASE_URL")
+}
+
+model Business {
+  id             String   @id @default(cuid())
+  metaBusinessId String   @unique
+  name           String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  pages      Page[]
+  adAccounts AdAccount[]
+}
+
+model Page {
+  id         String   @id @default(cuid())
+  metaPageId String   @unique
+  name       String
+  businessId String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business? @relation(fields: [businessId], references: [id])
+  leads    Lead[]
+}
+
+model AdAccount {
+  id              String   @id @default(cuid())
+  metaAdAccountId String   @unique
+  name            String
+  currency        String   @default("USD")
+  businessId      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  business  Business?  @relation(fields: [businessId], references: [id])
+  campaigns Campaign[]
+}
+
+model Campaign {
+  id             String   @id @default(cuid())
+  metaCampaignId String   @unique
+  name           String
+  adAccountId    String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  adAccount AdAccount         @relation(fields: [adAccountId], references: [id])
+  adSets    AdSet[]
+  leads     Lead[]
+  insights  InsightSnapshot[]
+}
+
+model AdSet {
+  id          String   @id @default(cuid())
+  metaAdSetId String   @unique
+  name        String
+  campaignId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  campaign Campaign          @relation(fields: [campaignId], references: [id])
+  ads      Ad[]
+  leads    Lead[]
+  insights InsightSnapshot[]
+}
+
+model Ad {
+  id         String   @id @default(cuid())
+  metaAdId   String   @unique
+  name       String
+  adSetId    String
+  creativeId String?
+  status     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  adSet                AdSet                    @relation(fields: [adSetId], references: [id])
+  creative             Creative?                @relation(fields: [creativeId], references: [id])
+  leads                Lead[]
+  insights             InsightSnapshot[]
+  performanceSnapshots AdPerformanceSnapshot[]
+  orderIncrements      DetectedOrderIncrement[]
+}
+
+model Creative {
+  id             String   @id @default(cuid())
+  metaCreativeId String   @unique
+  videoId        String?
+  postId         String?
+  reelId         String?
+  thumbnailUrl   String?
+  sourceType     String
+  extractionNote String?
+  rawMetadata    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  ads Ad[]
+}
+
+model Lead {
+  id               String    @id @default(cuid())
+  metaLeadId       String    @unique
+  name             String?
+  phone            String?
+  normalizedPhone  String?
+  email            String?
+  createdAt        DateTime  @default(now())
+  metaCreatedAt    DateTime?
+  pageId           String?
+  campaignId       String?
+  adSetId          String?
+  adId             String?
+  creativeId       String?
+  formId           String?
+  formName         String?
+  status           String    @default("جديد")
+  orderValue       Float?
+  submittedOrderAt DateTime?
+  isDuplicate      Boolean   @default(false)
+  duplicateOfId    String?
+  duplicateReason  String?
+  notes            String?
+  rawData          String?
+  updatedAt        DateTime  @updatedAt
+
+  page     Page?     @relation(fields: [pageId], references: [id])
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
+  adSet    AdSet?    @relation(fields: [adSetId], references: [id])
+  ad       Ad?       @relation(fields: [adId], references: [id])
+
+  statusHistory LeadStatusHistory[]
+}
+
+model LeadStatusHistory {
+  id        String   @id @default(cuid())
+  leadId    String
+  oldStatus String?
+  newStatus String
+  changedAt DateTime @default(now())
+  changedBy String
+  source    String
+
+  lead Lead @relation(fields: [leadId], references: [id])
+}
+
+model WebhookEvent {
+  id           String    @id @default(cuid())
+  eventKey     String    @unique
+  eventType    String
+  receivedAt   DateTime  @default(now())
+  processedAt  DateTime?
+  status       String    @default("PENDING")
+  rawPayload   String
+  errorMessage String?
+  retryCount   Int       @default(0)
+}
+
+model SyncLog {
+  id          String    @id @default(cuid())
+  source      String
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  status      String    @default("RUNNING")
+  details     String?
+}
+
+model InsightSnapshot {
+  id            String   @id @default(cuid())
+  date          DateTime
+  level         String
+  campaignId    String?
+  adSetId       String?
+  adId          String?
+  spend         Float    @default(0)
+  impressions   Int      @default(0)
+  reach         Int      @default(0)
+  clicks        Int      @default(0)
+  leadsCount    Int      @default(0)
+  ordersCount   Int      @default(0)
+  costPerResult Float?
+  currency      String   @default("USD")
+  fetchedAt     DateTime @default(now())
+
+  campaign Campaign? @relation(fields: [campaignId], references: [id])
+  adSet    AdSet?    @relation(fields: [adSetId], references: [id])
+  ad       Ad?       @relation(fields: [adId], references: [id])
+}
+
+model SyncRun {
+  id                 String    @id @default(cuid())
+  startedAt          DateTime  @default(now())
+  completedAt        DateTime?
+  status             String    @default("running")
+  adsProcessed       Int       @default(0)
+  metaOrdersDetected Int       @default(0)
+  errorMessage       String?
+  createdAt          DateTime  @default(now())
+
+  snapshots  AdPerformanceSnapshot[]
+  increments DetectedOrderIncrement[]
+}
+
+model AdPerformanceSnapshot {
+  id             String   @id @default(cuid())
+  adId           String
+  campaignId     String?
+  adSetId        String?
+  creativeId     String?
+  videoId        String?
+  snapshotTime   DateTime @default(now())
+  metaDate       DateTime
+  spend          Float
+  metaOrderCount Int
+  actionsRaw     String?
+  syncRunId      String
+  isBaseline     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  ad      Ad      @relation(fields: [adId], references: [id])
+  syncRun SyncRun @relation(fields: [syncRunId], references: [id])
+}
+
+model DetectedOrderIncrement {
+  id            String   @id @default(cuid())
+  adId          String
+  campaignId    String?
+  adSetId       String?
+  creativeId    String?
+  videoId       String?
+  detectedAt    DateTime @default(now())
+  windowStart   DateTime
+  windowEnd     DateTime
+  previousCount Int
+  currentCount  Int
+  newMetaOrders Int
+  spendDelta    Float
+  snapshotId    String
+  syncRunId     String
+  createdAt     DateTime @default(now())
+
+  ad      Ad      @relation(fields: [adId], references: [id])
+  syncRun SyncRun @relation(fields: [syncRunId], references: [id])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+}
+
+model AppSetting {
+  key   String @id
+  value String
+}
+
+model DailyReport {
+  id           String    @id @default(cuid())
+  reportDate   DateTime
+  generatedAt  DateTime  @default(now())
+  reconciledAt DateTime?
+  payload      String
+  createdAt    DateTime  @default(now())
+}

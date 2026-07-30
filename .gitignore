@@ -1,0 +1,36 @@
+node_modules/
+dist/
+build/
+.next/
+.env
+.env.local
+*.log
+server/prisma/dev.db
+server/prisma/dev.db-journal
+*.db
+*.db-journal
+server/data/
+backups/
+server/data-imports/
+.turbo/
+coverage/
+.DS_Store
+Thumbs.db
+google-credentials.json
+
+# مواد إنتاج فيديوهات إعلانية (~1.1GB) - أصول عمل ثقيلة غير متتبَّعة بـgit، تبقى محليًا فقط.
+# لا علاقة لها بتشغيل الخادم أو الواجهة (راجع البحث في الكود) - فقط ملفات إنتاج محتوى.
+video_work/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wav
+*.mp3
+
+# إعدادات Claude Code المحلية لهذا الجهاز (ليست جزءًا من تشغيل النظام). لاحظ أن
+# settings.local.json الحالي يحتوي فعليًا توكن Meta حقيقي ضمن سجل صلاحيات قديم - لا يُرفع لـgit.
+.claude/
+
+# ملفات build cache مُولَّدة محليًا
+*.tsbuildinfo
