@@ -148,7 +148,7 @@ model LicenseDevice {
 model MetaConnection {
   id                   String    @id @default(cuid())
   workspaceId          String
-  metaUserId           String?
+  metaUserId           String
   accessTokenEncrypted String // AES-256-GCM ciphertext (base64) — لا يُعاد إرساله للواجهة أبدًا
   tokenIv              String
   tokenTag             String
@@ -166,6 +166,8 @@ model MetaConnection {
   pages      Page[]
   adAccounts AdAccount[]
 
+  // إعادة تسجيل دخول نفس مستخدم Facebook تُحدّث نفس الاتصال بدل إنشاء صف مكرر
+  @@unique([workspaceId, metaUserId])
   @@index([workspaceId])
 }
 

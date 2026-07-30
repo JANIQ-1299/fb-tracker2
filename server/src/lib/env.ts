@@ -25,6 +25,9 @@ export const env = {
   tz: required("APP_TIMEZONE", required("TZ", "Asia/Baghdad")),
   defaultCurrency: required("DEFAULT_CURRENCY", "IQD"),
   publicBaseUrl: required("PUBLIC_BASE_URL", "http://localhost:4000"),
+  // عنوان لوحة تحكم الـWorkspace (Next.js) — يُستخدم فقط لإعادة توجيه المتصفح إليها بعد
+  // اكتمال Meta OAuth (الخادم لا يعرف عنوان الواجهة تلقائيًا لأنه أصل منفصل تمامًا محليًا).
+  webPublicBaseUrl: required("WEB_PUBLIC_BASE_URL", "http://localhost:3000"),
 
   autoSyncEnabled: required("AUTO_SYNC_ENABLED", "true") === "true",
   autoSyncCron: required("AUTO_SYNC_CRON", "0 * * * *"),

@@ -27,11 +27,15 @@ interface LeadgenDetails {
   field_data?: LeadFieldData[];
 }
 
-export async function fetchLeadDetails(leadgenId: string): Promise<LeadgenDetails> {
-  return metaGet<LeadgenDetails>(leadgenId, {
-    fields:
-      "id,created_time,ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,form_id,page_id,field_data",
-  });
+export async function fetchLeadDetails(leadgenId: string, accessToken?: string): Promise<LeadgenDetails> {
+  return metaGet<LeadgenDetails>(
+    leadgenId,
+    {
+      fields:
+        "id,created_time,ad_id,ad_name,adset_id,adset_name,campaign_id,campaign_name,form_id,page_id,field_data",
+    },
+    { accessToken },
+  );
 }
 
 function extractField(fields: LeadFieldData[] | undefined, ...names: string[]): string | undefined {
@@ -75,10 +79,14 @@ export interface ExtractedCreative {
  * لذلك نحاول عدة مسارات بالترتيب ونسجّل أيها نجح، وإن فشلت كلها نخزّن السبب صراحة
  * بدل ترك الحقل فارغًا بصمت.
  */
-export async function fetchAndExtractCreative(adId: string): Promise<ExtractedCreative> {
-  const adData = await metaGet<any>(adId, {
-    fields: "creative{id,object_type,video_id,effective_object_story_id,thumbnail_url,asset_feed_spec,object_story_spec}",
-  });
+export async function fetchAndExtractCreative(adId: string, accessToken?: string): Promise<ExtractedCreative> {
+  const adData = await metaGet<any>(
+    adId,
+    {
+      fields: "creative{id,object_type,video_id,effective_object_story_id,thumbnail_url,asset_feed_spec,object_story_spec}",
+    },
+    { accessToken },
+  );
 
   const creative = adData.creative;
   if (!creative) {

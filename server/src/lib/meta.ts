@@ -20,6 +20,10 @@ export class MetaApiError extends Error {
 interface RetryOptions {
   maxRetries?: number;
   baseDelayMs?: number;
+  // توكن مستخدم/اتصال Meta محدَّد (متعدد المستأجرين) بدل توكن env الثابت أحادي المستأجر.
+  // لا يُستخدم إلا لنداءات OAuth الجديدة؛ كل الاستدعاءات القديمة تبقى تستخدم env.metaPageAccessToken
+  // كما هي دون أي تغيير في السلوك.
+  accessToken?: string;
 }
 
 /**
@@ -31,12 +35,12 @@ export async function metaGet<T = any>(
   params: Record<string, string | number | undefined> = {},
   opts: RetryOptions = {},
 ): Promise<T> {
-  const { maxRetries = 3, baseDelayMs = 500 } = opts;
+  const { maxRetries = 3, baseDelayMs = 500, accessToken } = opts;
   const url = `${GRAPH_BASE}/${env.metaGraphApiVersion}/${pathAndQuery}`;
 
   let attempt = 0;
   // access_token يُرفق دائمًا هنا، وليس في أي مكان آخر يمكن أن يُسجَّل.
-  const query = { ...params, access_token: env.metaPageAccessToken };
+  const query = { ...params, access_token: accessToken ?? env.metaPageAccessToken };
 
   for (;;) {
     try {

@@ -77,13 +77,23 @@ export default function WorkspaceHome() {
       <div className="card" style={{ marginTop: 8 }}>
         <div className="label">ربط حساب Meta</div>
         <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
-          ربط الصفحات والحسابات الإعلانية عبر Meta OAuth، ومزامنة الحملات والإعلانات، ورفع ملفات
-          الطلبات — كل ذلك ضمن المرحلة القادمة من التنفيذ.
+          اربط صفحتك وحسابك الإعلاني عبر Meta، وزامن الحملات والإعلانات والفيديوهات. رفع ملفات
+          الطلبات ومحرك المطابقة ضمن مرحلة قادمة.
         </p>
-        <button className="btn" disabled>
-          ربط حساب Meta (قريبًا)
-        </button>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button className="btn" onClick={connectMeta}>
+            ربط حساب Meta
+          </button>
+          <a className="btn secondary" href="/workspace/meta" style={{ display: "inline-flex", alignItems: "center" }}>
+            إدارة اتصالات Meta الحالية
+          </a>
+        </div>
       </div>
     </main>
   );
+
+  async function connectMeta() {
+    const res = await workspaceApiFetch<{ url: string }>("/api/meta/oauth/start");
+    window.location.href = res.url;
+  }
 }

@@ -14,12 +14,14 @@ import { dataDeletionRouter } from "./routes/dataDeletion.js";
 import { workspaceAuthRouter } from "./routes/workspaceAuth.js";
 import { superAdminAuthRouter } from "./routes/superAdminAuth.js";
 import { superAdminRouter } from "./routes/superAdmin.js";
+import { metaOAuthRouter } from "./routes/metaOAuth.js";
+import { metaConnectionsRouter } from "./routes/metaConnections.js";
+import { metaSyncRouter } from "./routes/metaSync.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import {
   apiRateLimiter,
   authRateLimiter,
   webhookRateLimiter,
-  workspaceAuthRateLimiter,
   superAdminAuthRateLimiter,
 } from "./middleware/rateLimit.js";
 
@@ -50,9 +52,17 @@ export function buildApp() {
   app.use("/api/dashboard", apiRateLimiter, dashboardRouter);
 
   // ---- Multi-Tenant: دخول مستخدمي الـWorkspaces + طبقة Super Admin (منفصلة تمامًا) ----
-  app.use("/api/auth/user", workspaceAuthRateLimiter, workspaceAuthRouter);
+  // الحد الصارم لمحاولات الدخول مطبَّق داخل workspaceAuthRouter نفسه على POST /login فقط -
+  // هنا نستخدم الحد العام الأكثر تساهلًا لأن GET /me يُستدعى في كل تحميل صفحة.
+  app.use("/api/auth/user", apiRateLimiter, workspaceAuthRouter);
   app.use("/api/superadmin/auth", superAdminAuthRateLimiter, superAdminAuthRouter);
   app.use("/api/superadmin", apiRateLimiter, superAdminRouter);
+
+  // ---- Meta OAuth (نقطة التوقف 1): ربط الحساب، اختيار الأصول، والمزامنة - كلها مربوطة بـ
+  // workspaceId من الجلسة فقط. لا علاقة لها بخط Webhook/Insights القديم في jobs/insights.ts. ----
+  app.use("/api/meta/oauth", apiRateLimiter, metaOAuthRouter);
+  app.use("/api/meta/connections", apiRateLimiter, metaConnectionsRouter);
+  app.use("/api/meta/sync", apiRateLimiter, metaSyncRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -9,6 +9,7 @@ import { getSystemState } from "../lib/systemState.js";
 import { getEffectiveSubscription, SUSPENSION_MESSAGES } from "../lib/subscription.js";
 import { requireUser, type WorkspaceAuthedRequest } from "../middleware/workspaceAuth.js";
 import { requireActiveWorkspace, requireSystemActive } from "../middleware/workspaceGuard.js";
+import { workspaceAuthRateLimiter } from "../middleware/rateLimit.js";
 
 export const workspaceAuthRouter = Router();
 
@@ -20,7 +21,11 @@ const loginSchema = z.object({
 // دخول مستخدمي الـWorkspaces (النظام الجديد). الحسابات تُنشأ يدويًا فقط حاليًا (لا تسجيل عام) -
 // راجع server/prisma/seedWorkspace.ts. التحقق من حالة النظام والاشتراك يتم هنا **قبل** إصدار
 // الجلسة مباشرة بعد التحقق من كلمة المرور، وليس فقط عند فتح لوحة التحكم لاحقًا.
-workspaceAuthRouter.post("/login", async (req, res) => {
+//
+// الحد الصارم لمحاولات الدخول (workspaceAuthRateLimiter) يُطبَّق هنا فقط على /login تحديدًا -
+// وليس على المسار بأكمله - لأن /me أدناه يُستدعى في كل تحميل صفحة (فحص جلسة روتيني وليس محاولة
+// دخول)، وتطبيق نفس الحد الصارم عليه كان يُستهلك الحصة بسرعة من مجرد فتح لوحة التحكم عدة مرات.
+workspaceAuthRouter.post("/login", workspaceAuthRateLimiter, async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "بيانات دخول غير صالحة" });
   const { email, password } = parsed.data;
