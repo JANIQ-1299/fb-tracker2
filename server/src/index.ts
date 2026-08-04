@@ -4,6 +4,7 @@ import { logger } from "./lib/logger.js";
 import { scheduleInsightsJob } from "./jobs/insights.js";
 import { scheduleSheetsSync } from "./jobs/sheetsSync.js";
 import { scheduleDailyReportJob } from "./jobs/dailyReport.js";
+import { scheduleMessagePurgeJob } from "./jobs/purgeMessageText.js";
 
 const app = buildApp();
 
@@ -13,5 +14,6 @@ app.listen(env.port, () => {
     scheduleInsightsJob();
     scheduleSheetsSync();
     scheduleDailyReportJob();
+    scheduleMessagePurgeJob();
   }
 });

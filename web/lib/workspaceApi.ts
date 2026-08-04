@@ -46,3 +46,25 @@ export async function workspaceApiFetch<T = any>(path: string, options: RequestI
   if (!res.ok) throw new ApiError(data?.error ?? "حدث خطأ", res.status, data?.workspaceStatus);
   return data as T;
 }
+
+/** لتنزيل ملفات (مثل تصدير Excel) - يستخدم fetch + Authorization header وليس <a href> مباشرة،
+ * لأن التوثيق هنا عبر Bearer token في localStorage وليس كوكي جلسة. */
+export async function workspaceApiDownload(path: string, suggestedFilename: string): Promise<void> {
+  const token = getWorkspaceToken();
+  const res = await fetch(`${API_BASE}${path}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new ApiError(data?.error ?? "فشل تصدير الملف", res.status);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = suggestedFilename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

@@ -18,6 +18,9 @@ import { metaOAuthRouter } from "./routes/metaOAuth.js";
 import { metaConnectionsRouter } from "./routes/metaConnections.js";
 import { metaSyncRouter } from "./routes/metaSync.js";
 import { importsRouter } from "./routes/imports.js";
+import { attributionRouter } from "./routes/attribution.js";
+import { messagingRouter } from "./routes/messaging.js";
+import { conversationImportRouter } from "./routes/conversationImport.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import {
   apiRateLimiter,
@@ -41,6 +44,7 @@ export function buildApp() {
   app.use(cookieParser());
 
   app.use("/webhook/meta/leads", webhookRateLimiter, express.raw({ type: "application/json" }));
+  app.use("/webhook/meta/messaging", webhookRateLimiter, express.raw({ type: "application/json" }));
   app.use("/webhook", webhookRouter);
 
   app.use(express.json({ limit: "1mb" }));
@@ -67,6 +71,16 @@ export function buildApp() {
 
   // ---- استيراد ملفات الطلبات (Excel/CSV) - لا يُنشئ OrderAttribution إطلاقًا في هذه المرحلة ----
   app.use("/api/imports", apiRateLimiter, importsRouter);
+
+  // ---- محرك مطابقة مصادر الطلبات (نقطة التوقف 3) ----
+  app.use("/api/attribution", apiRateLimiter, attributionRouter);
+
+  // ---- رسائل إنستغرام (Forward-Looking فقط) - راجع MessagingIntegration في schema.prisma ----
+  app.use("/api/messaging", apiRateLimiter, messagingRouter);
+
+  // ---- Historical Conversation Import: استيراد بيانات محادثة مجرَّدة (بلا نصوص) يرفعها مالك
+  // الـWorkspace بنفسه - لا يوجد هنا أي استدعاء لـConversations/Messages API. راجع DECISIONS.md ----
+  app.use("/api/conversation-import", apiRateLimiter, conversationImportRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

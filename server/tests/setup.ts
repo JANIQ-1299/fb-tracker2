@@ -7,10 +7,16 @@ export const TEST_WORKSPACE_ID = "test-workspace-1";
 
 // ترتيب الحذف يراعي القيود الأجنبية (foreign keys)
 beforeEach(async () => {
+  await prisma.message.deleteMany();
+  await prisma.conversation.deleteMany();
+  await prisma.conversationImportBatch.deleteMany();
+  await prisma.orderAttributionHistory.deleteMany();
   await prisma.orderAttribution.deleteMany();
   await prisma.order.deleteMany();
   await prisma.importedFile.deleteMany();
   await prisma.mappingRule.deleteMany();
+  await prisma.importColumnTemplate.deleteMany();
+  await prisma.messagingIntegration.deleteMany();
   await prisma.licenseDevice.deleteMany();
   await prisma.leadStatusHistory.deleteMany();
   await prisma.lead.deleteMany();

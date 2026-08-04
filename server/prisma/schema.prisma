@@ -38,6 +38,12 @@ model Workspace {
   orders            Order[]
   orderAttributions OrderAttribution[]
   mappingRules      MappingRule[]
+  orderAttributionHistory OrderAttributionHistory[]
+  importColumnTemplates  ImportColumnTemplate[]
+  messagingIntegration   MessagingIntegration?
+  conversations           Conversation[]
+  messages                Message[]
+  conversationImportBatches ConversationImportBatch[]
 }
 
 model User {
@@ -205,6 +211,8 @@ model Page {
   business          Business?          @relation(fields: [businessId], references: [id])
   leads             Lead[]
   orderAttributions OrderAttribution[]
+  conversations         Conversation[]
+  messagingIntegrations MessagingIntegration[]
 
   @@unique([workspaceId, metaPageId])
 }
@@ -585,6 +593,8 @@ model Order {
   workspace    Workspace         @relation(fields: [workspaceId], references: [id])
   importedFile ImportedFile      @relation(fields: [importedFileId], references: [id])
   attribution  OrderAttribution?
+  attributionHistory OrderAttributionHistory[]
+  conversations      Conversation[]
 
   @@index([workspaceId])
   @@index([normalizedPhone])
@@ -602,9 +612,14 @@ model OrderAttribution {
   adSetId     String?
   adId        String?
   creativeId  String?
-  matchMethod String? // AD_ID | LEAD_ID | CAMPAIGN_ADSET | NAME | PHONE | TIME | MANUAL
-  matchStatus String    @default("UNMATCHED") // EXACT | PROBABLE | MANUAL | UNMATCHED
+  // AD_ID | LEAD_ID | CAMPAIGN_ADSET | NAME | PHONE | MAPPING_RULE | MANUAL |
+  // MESSAGE_REFERRAL_AD_ID | MESSAGE_PHONE (الأخيران من مطابقة محادثات إنستغرام - راجع conversationMatch.ts)
+  matchMethod String?
+  // EXACT | PROBABLE | MANUAL | NEEDS_REVIEW | UNMATCHED
+  // NEEDS_REVIEW: عدة طلبات مرشّحة بنفس رقم الهاتف لمحادثة واحدة دون فائز واضح - لا تُربَط تلقائيًا
+  matchStatus String    @default("UNMATCHED")
   confidence  Float     @default(0)
+  reason      String? // شرح مقروء لسبب اختيار هذه النتيجة (أو سبب عدم وجود تطابق)
   matchedAt   DateTime?
   matchedBy   String? // user id إن كانت مطابقة يدوية
 
@@ -622,6 +637,33 @@ model OrderAttribution {
   @@index([adId])
 }
 
+// سجل كامل لكل تغيير يطرأ على OrderAttribution (تلقائي أو يدوي) - لا يُستبدَل أي صف موجود،
+// فقط يُضاف صف تاريخي جديد عند كل تغيير فعلي في القيم.
+model OrderAttributionHistory {
+  id                  String   @id @default(cuid())
+  orderId             String
+  workspaceId         String
+  previousMatchMethod String?
+  previousMatchStatus String?
+  previousConfidence  Float?
+  previousReason      String?
+  previousStateJson   String? // لقطة كاملة (campaignId/adSetId/adId/creativeId) قبل التغيير
+  newMatchMethod      String?
+  newMatchStatus      String
+  newConfidence       Float
+  newReason           String?
+  newStateJson        String?
+  changeSource        String // AUTO_RUN | MANUAL | MESSAGE_PHONE | MESSAGE_REFERRAL_AD_ID
+  changedBy           String? // user id إن كان التغيير يدويًا
+  changedAt           DateTime @default(now())
+
+  order     Order     @relation(fields: [orderId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@index([orderId])
+  @@index([workspaceId])
+}
+
 model MappingRule {
   id                 String   @id @default(cuid())
   workspaceId        String
@@ -635,4 +677,143 @@ model MappingRule {
   workspace Workspace @relation(fields: [workspaceId], references: [id])
 
   @@unique([workspaceId, ruleType, matchKey])
+}
+
+// قالب ربط أعمدة محفوظ لإعادة استخدامه على أي ملف Excel/CSV مستقبلي بنفس تخطيط الأعمدة تقريبًا -
+// المفتاح نص العنوان الموحَّد (normalizeHeader) وليس رقم الفهرس، حتى يعمل حتى لو تغيّر ترتيب
+// الأعمدة بين ملف وآخر.
+model ImportColumnTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  mappingJson String // JSON: { normalizedHeaderText: canonicalFieldKey }
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, name])
+}
+
+// ============================================================
+// رسائل إنستغرام/ماسنجر - يعمل على الرسائل الجديدة فقط من لحظة التفعيل (Forward-Looking)
+// لا يوجد أي كود هنا يقرأ أو يبحث في محادثات قديمة موجودة مسبقًا - راجع DECISIONS.md ونقاش
+// حدود الخصوصية في الجلسة. كل شيء هنا اختياري (Opt-in) لكل Workspace على حدة.
+// ============================================================
+
+model MessagingIntegration {
+  id               String    @id @default(cuid())
+  workspaceId      String    @unique
+  pageId           String?
+  enabled          Boolean   @default(false)
+  enabledAt        DateTime?
+  enabledBy        String? // user id
+  disabledAt       DateTime?
+  // مدة الاحتفاظ بنص الرسالة الخام قبل حذفه تلقائيًا (أيام) - قابلة للتعديل: 7 | 30 | 90 أو قيمة مخصصة
+  retentionDays    Int       @default(30)
+  // نافذة المطابقة الزمنية بين بداية المحادثة/الرسالة وتاريخ الطلب المرشَّح (ساعات) - افتراضي 48
+  matchWindowHours Int       @default(48)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  page      Page?     @relation(fields: [pageId], references: [id])
+}
+
+model Conversation {
+  id                   String    @id @default(cuid())
+  workspaceId          String
+  pageId               String
+  platform             String    @default("INSTAGRAM") // INSTAGRAM | MESSENGER
+  platformThreadId     String // معرّف العميل/المحادثة المستقر من حمولة Meta (PSID/IGSID)
+  customerPsid         String
+  // إعلانات Click-to-Message: تصل هذه القيم مباشرة في حمولة Webhook (messaging.referral) عند بدء
+  // المحادثة من إعلان محدد - إشارة أقوى بكثير من مطابقة الهاتف فقط.
+  referralAdId            String?
+  referralAdInternalId    String? // Ad.id الداخلي إن أمكن حلّه وقت الالتقاط
+  referralAdSetInternalId String?
+  referralCampaignInternalId String?
+  referralCreativeInternalId String?
+  // Snapshot لأسماء الإعلان/المجموعة/الحملة والفيديو وقت الالتقاط - حتى لا تختفي البيانات إذا
+  // حُذف الإعلان أو تغيّر اسمه لاحقًا في Meta.
+  referralAdNameSnapshot      String?
+  referralAdSetNameSnapshot   String?
+  referralCampaignNameSnapshot String?
+  referralVideoIdSnapshot      String?
+  normalizedPhoneExtracted String?
+  // MATCHED | NEEDS_REVIEW | UNMATCHED - راجع conversationMatch.ts لمنطق حسم الغموض
+  matchStatus          String    @default("UNMATCHED")
+  matchedOrderId        String?
+  // عند NEEDS_REVIEW: JSON لقائمة الطلبات المرشَّحة مع درجة كل منها للمراجعة اليدوية
+  candidateOrdersJson    String?
+  matchedAt               DateTime?
+  firstMessageAt          DateTime
+  lastMessageAt            DateTime
+  // WEBHOOK (رسائل جديدة عبر Webhook حي) | HISTORICAL_IMPORT (ملف بيانات محادثة مجرَّدة رفعه
+  // مالك الـWorkspace بنفسه - لا يوجد أي استدعاء لـConversations/Messages API في هذا المشروع).
+  source                   String   @default("WEBHOOK")
+  importBatchId            String?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  workspace    Workspace                 @relation(fields: [workspaceId], references: [id])
+  page         Page                      @relation(fields: [pageId], references: [id])
+  matchedOrder Order?                    @relation(fields: [matchedOrderId], references: [id])
+  messages     Message[]
+  importBatch  ConversationImportBatch?  @relation(fields: [importBatchId], references: [id])
+
+  @@unique([workspaceId, platform, platformThreadId])
+  @@index([workspaceId])
+  @@index([normalizedPhoneExtracted])
+  @@index([matchedOrderId])
+  @@index([importBatchId])
+}
+
+// ============================================================
+// Historical Conversation Import - وحدة استيراد بيانات محادثة مجرَّدة (بلا نصوص رسائل ولا أسماء)
+// يرفعها مالك الـWorkspace بنفسه من ملف يُعِدّه هو خارج هذا المشروع تمامًا. لا يوجد هنا ولن يكون
+// أي استدعاء لـ Instagram Conversations/Messages API - هذا مستورد بيانات عام (نفس فئة استيراد
+// ملفات الطلبات)، وليس أداة جلب أو مسح محادثات. راجع DECISIONS.md.
+// ============================================================
+
+model ConversationImportBatch {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  filename       String
+  uploadedBy     String // user id
+  uploadedAt     DateTime  @default(now())
+  rowCount       Int       @default(0)
+  acceptedCount  Int       @default(0)
+  rejectedCount  Int       @default(0)
+  duplicateCount Int       @default(0)
+  status         String    @default("PROCESSING") // PROCESSING | DONE | FAILED
+  errorSummary   String? // JSON: صفوف ناقصة/بها خطأ/متعارضة - للمراجعة اللاحقة (سجل تدقيق هذه الدفعة)
+  deletedAt      DateTime? // عند حذف كل بيانات الدفعة عبر "حذف جميع البيانات المستوردة"
+
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id])
+  conversations Conversation[]
+
+  @@index([workspaceId])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  workspaceId    String
+  conversationId String
+  direction      String // INBOUND | OUTBOUND
+  metaMessageId  String? // لضمان Idempotency - نفس الرسالة لا تُخزَّن مرتين
+  // نص الرسالة الخام - يُحذف تلقائيًا بعد MessagingIntegration.retentionDays (راجع purgeMessageText.ts)
+  // بعد الحذف يبقى فقط: extractedPhone + معرّف الرسالة/المحادثة + الوقت + نتيجة المطابقة
+  textRaw        String?
+  extractedPhone String?
+  receivedAt     DateTime  @default(now())
+  textPurgedAt   DateTime?
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  workspace    Workspace    @relation(fields: [workspaceId], references: [id])
+
+  @@unique([workspaceId, metaMessageId])
+  @@index([conversationId])
+  @@index([workspaceId])
 }

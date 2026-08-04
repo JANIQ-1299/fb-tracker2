@@ -92,11 +92,42 @@ export default function WorkspaceHome() {
       <div className="card" style={{ marginTop: 16 }}>
         <div className="label">استيراد الطلبات</div>
         <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
-          ارفع ملف Excel/CSV يحتوي طلباتك، وعاين واربط الأعمدة قبل الاستيراد. مطابقة الطلبات
-          بالإعلانات ضمن مرحلة قادمة.
+          ارفع ملف Excel/CSV يحتوي طلباتك، وعاين واربط الأعمدة قبل الاستيراد.
         </p>
         <a className="btn" href="/workspace/imports" style={{ display: "inline-flex", alignItems: "center" }}>
           استيراد الطلبات
+        </a>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="label">مطابقة مصادر الطلبات</div>
+        <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
+          حدّد مصدر كل طلب (الحملة/المجموعة/الإعلان) تلقائيًا عند توفر دليل حقيقي، وطابق ما تبقّى يدويًا.
+        </p>
+        <a className="btn" href="/workspace/attribution" style={{ display: "inline-flex", alignItems: "center" }}>
+          مطابقة مصادر الطلبات
+        </a>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="label">رسائل إنستغرام</div>
+        <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
+          استقبال تلقائي للرسائل الجديدة فقط من لحظة التفعيل، لربطها بطلباتها عند توفر رقم هاتف أو
+          إعلان مرجعي.
+        </p>
+        <a className="btn" href="/workspace/messaging" style={{ display: "inline-flex", alignItems: "center" }}>
+          إعدادات رسائل إنستغرام
+        </a>
+      </div>
+
+      <div className="card" style={{ marginTop: 16 }}>
+        <div className="label">Historical Conversation Import</div>
+        <p style={{ color: "var(--text-dim)", fontSize: 14 }}>
+          استيراد بيانات محادثة مجرَّدة (بلا نصوص) من ملف تُعِدّه بنفسك، لمطابقة طلبات قديمة بأرقام
+          الهاتف أو الإعلان المرجعي.
+        </p>
+        <a className="btn" href="/workspace/conversation-import" style={{ display: "inline-flex", alignItems: "center" }}>
+          استيراد بيانات محادثة تاريخية
         </a>
       </div>
     </main>

@@ -15,6 +15,7 @@ import {
 import { CANONICAL_FIELDS, detectColumnMapping, type CanonicalField } from "../services/importColumns.js";
 import { createStaging, deleteStaging, getStaging } from "../services/importStaging.js";
 import { processImportRows, type ProcessResult } from "../services/importProcessor.js";
+import { saveImportTemplate, listImportTemplates, applyTemplateToHeaders } from "../services/importTemplates.js";
 
 export const importsRouter = Router();
 importsRouter.use(requireUser, requireSystemActive, requireActiveWorkspace);
@@ -219,6 +220,29 @@ importsRouter.post("/:stagingId/confirm", async (req: WorkspaceAuthedRequest, re
     logger.error({ err: (err as Error).message, workspaceId }, "فشل تأكيد استيراد الطلبات");
     res.status(500).json({ error: "فشل استيراد الملف، حاول مرة أخرى" });
   }
+});
+
+// ---- قوالب ربط الأعمدة المحفوظة - لإعادة استخدامها على أي ملف Excel/CSV مستقبلي بنفس التخطيط ----
+importsRouter.get("/templates", async (req: WorkspaceAuthedRequest, res) => {
+  const templates = await listImportTemplates(req.user!.workspaceId);
+  res.json({ templates });
+});
+
+const saveTemplateSchema = z.object({
+  name: z.string().min(1).max(100),
+  headers: z.array(z.string()),
+  columnMapping: mappingSchema,
+});
+
+importsRouter.post("/templates", async (req: WorkspaceAuthedRequest, res) => {
+  const parsed = saveTemplateSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "بيانات القالب غير صالحة" });
+  const mapping = toColumnMapping(parsed.data.columnMapping);
+  if (Object.keys(mapping).length === 0) {
+    return res.status(400).json({ error: "لا يمكن حفظ قالب فارغ - اربط عمودًا واحدًا على الأقل أولًا" });
+  }
+  const template = await saveImportTemplate(req.user!.workspaceId, parsed.data.name, parsed.data.headers, mapping);
+  res.json({ template });
 });
 
 // ---- سجل ملفات الاستيراد ----

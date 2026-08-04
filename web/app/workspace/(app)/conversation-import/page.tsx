@@ -22,57 +22,56 @@ interface RowIssue {
   reason: string;
 }
 
+interface GroupedRow {
+  conversationId: string;
+  customerPsid: string;
+  pageMetaId: string;
+  normalizedPhone: string | null;
+  referralAdId: string | null;
+  firstMessageAt: string;
+  lastMessageAt: string;
+  rowCount: number;
+  conflicts: string[];
+}
+
 interface ValidationResult {
   totalRows: number;
-  validCount: number;
+  groupedCount: number;
   missingCount: number;
   errorCount: number;
-  duplicateCount: number;
+  conflictCount: number;
   missing: RowIssue[];
   errors: RowIssue[];
-  duplicates: RowIssue[];
-  sampleValid: { rowNumber: number; data: Record<string, unknown> }[];
+  sampleGrouped: GroupedRow[];
+  conflicting: GroupedRow[];
 }
 
-interface ImportTemplate {
-  id: string;
-  name: string;
-  createdAt: string;
-  mapping: Record<string, string>; // normalizedHeaderText -> canonicalField
+interface AttributionSummary {
+  total: number;
+  exact: number;
+  probable: number;
+  manual: number;
+  needsReview: number;
+  unmatched: number;
 }
 
-interface ImportFileRow {
+interface ImportBatch {
   id: string;
   filename: string;
   uploadedAt: string;
-  uploadedByEmail: string;
   rowCount: number;
   acceptedCount: number;
   rejectedCount: number;
   duplicateCount: number;
   status: string;
+  deletedAt: string | null;
 }
 
 type Step = "select-file" | "select-sheet" | "mapping" | "validation" | "done";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:4000";
 
-// نسخة مبسّطة من normalizeHeader في السيرفر (importColumns.ts) - تكفي لاقتراح القالب المناسب على
-// الواجهة؛ القرار النهائي يبقى للمستخدم عبر شاشة الربط.
-function normalizeHeaderClient(raw: string): string {
-  return raw
-    .trim()
-    .toLowerCase()
-    .replace(/[أإآ]/g, "ا")
-    .replace(/ة/g, "ه")
-    .replace(/ى/g, "ي")
-    .replace(/[_\-]+/g, " ")
-    .replace(/[:؟?.]+$/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-export default function ImportsPage() {
+export default function ConversationImportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>("select-file");
   const [error, setError] = useState<string | null>(null);
@@ -88,63 +87,21 @@ export default function ImportsPage() {
 
   const [validating, setValidating] = useState(false);
   const [validation, setValidation] = useState<ValidationResult | null>(null);
-  const [duplicateStrategy, setDuplicateStrategy] = useState<"skip" | "import_flagged">("skip");
+  const [confirmChecked, setConfirmChecked] = useState(false);
 
   const [confirming, setConfirming] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [resultSummary, setResultSummary] = useState<{ batch: ImportBatch; attributionSummary: AttributionSummary } | null>(null);
 
-  const [history, setHistory] = useState<ImportFileRow[]>([]);
-  const [templates, setTemplates] = useState<ImportTemplate[]>([]);
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
-  const [savingTemplate, setSavingTemplate] = useState(false);
+  const [batches, setBatches] = useState<ImportBatch[]>([]);
 
-  async function loadHistory() {
-    const res = await workspaceApiFetch<{ files: ImportFileRow[] }>("/api/imports");
-    setHistory(res.files);
-  }
-
-  async function loadTemplates() {
-    const res = await workspaceApiFetch<{ templates: ImportTemplate[] }>("/api/imports/templates");
-    setTemplates(res.templates);
+  async function loadBatches() {
+    const res = await workspaceApiFetch<{ batches: ImportBatch[] }>("/api/conversation-import/batches");
+    setBatches(res.batches);
   }
 
   useEffect(() => {
-    loadHistory();
-    loadTemplates();
+    loadBatches();
   }, []);
-
-  function applyTemplate(templateId: string) {
-    setSelectedTemplateId(templateId);
-    if (!templateId || !sheetData) return;
-    const template = templates.find((t) => t.id === templateId);
-    if (!template) return;
-    const next: Record<number, string> = {};
-    sheetData.headers.forEach((h, i) => {
-      const key = normalizeHeaderClient(h);
-      const field = template.mapping[key];
-      if (field) next[i] = field;
-    });
-    setHeaderToField(next);
-  }
-
-  async function saveCurrentAsTemplate() {
-    if (!sheetData) return;
-    const name = window.prompt("اسم القالب (مثال: قالب ملف الموظف أحمد)");
-    if (!name) return;
-    setSavingTemplate(true);
-    try {
-      await workspaceApiFetch("/api/imports/templates", {
-        method: "POST",
-        body: JSON.stringify({ name, headers: sheetData.headers, columnMapping: buildColumnMapping() }),
-      });
-      await loadTemplates();
-      setError(null);
-    } catch (err: any) {
-      setError(err.message ?? "فشل حفظ القالب");
-    } finally {
-      setSavingTemplate(false);
-    }
-  }
 
   function resetWizard() {
     setStep("select-file");
@@ -155,7 +112,8 @@ export default function ImportsPage() {
     setSheetData(null);
     setHeaderToField({});
     setValidation(null);
-    setSuccessMessage(null);
+    setConfirmChecked(false);
+    setResultSummary(null);
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -169,7 +127,7 @@ export default function ImportsPage() {
       const formData = new FormData();
       formData.append("file", file);
       const token = getWorkspaceToken();
-      const res = await fetch(`${API_BASE}/api/imports/upload`, {
+      const res = await fetch(`${API_BASE}/api/conversation-import/upload`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -196,7 +154,7 @@ export default function ImportsPage() {
     setError(null);
     try {
       const res = await workspaceApiFetch<SheetResponse>(
-        `/api/imports/${stId}/sheets/${encodeURIComponent(sheetName)}`,
+        `/api/conversation-import/${stId}/sheets/${encodeURIComponent(sheetName)}`,
       );
       setSelectedSheet(sheetName);
       setSheetData(res);
@@ -222,11 +180,12 @@ export default function ImportsPage() {
     setValidating(true);
     setError(null);
     try {
-      const res = await workspaceApiFetch<ValidationResult>(`/api/imports/${stagingId}/validate`, {
+      const res = await workspaceApiFetch<ValidationResult>(`/api/conversation-import/${stagingId}/validate`, {
         method: "POST",
         body: JSON.stringify({ sheetName: selectedSheet, columnMapping: buildColumnMapping() }),
       });
       setValidation(res);
+      setConfirmChecked(false);
       setStep("validation");
     } catch (err: any) {
       setError(err.message ?? "فشلت معاينة النتائج");
@@ -236,21 +195,20 @@ export default function ImportsPage() {
   }
 
   async function confirmImport() {
-    if (!stagingId) return;
+    if (!stagingId || !confirmChecked) return;
     setConfirming(true);
     setError(null);
     try {
-      const res = await workspaceApiFetch<{ message: string }>(`/api/imports/${stagingId}/confirm`, {
-        method: "POST",
-        body: JSON.stringify({
-          sheetName: selectedSheet,
-          columnMapping: buildColumnMapping(),
-          duplicateStrategy,
-        }),
-      });
-      setSuccessMessage(res.message);
+      const res = await workspaceApiFetch<{ batch: ImportBatch; attributionSummary: AttributionSummary }>(
+        `/api/conversation-import/${stagingId}/confirm`,
+        {
+          method: "POST",
+          body: JSON.stringify({ sheetName: selectedSheet, columnMapping: buildColumnMapping(), confirm: true }),
+        },
+      );
+      setResultSummary(res);
       setStep("done");
-      loadHistory();
+      loadBatches();
     } catch (err: any) {
       setError(err.message ?? "فشل تأكيد الاستيراد");
     } finally {
@@ -258,15 +216,36 @@ export default function ImportsPage() {
     }
   }
 
+  async function deleteBatch(batchId: string) {
+    if (!window.confirm("حذف كل بيانات هذه الدفعة نهائيًا؟ سيُعاد حساب مطابقة الطلبات تلقائيًا بعد الحذف.")) return;
+    try {
+      await workspaceApiFetch(`/api/conversation-import/batches/${batchId}`, { method: "DELETE" });
+      await loadBatches();
+    } catch (err: any) {
+      setError(err.message ?? "فشل الحذف");
+    }
+  }
+
+  async function deleteAll() {
+    if (!window.confirm("حذف جميع بيانات الاستيراد التاريخي لكل الدفعات نهائيًا؟ سيُعاد حساب مطابقة الطلبات تلقائيًا بعد الحذف.")) return;
+    try {
+      await workspaceApiFetch("/api/conversation-import/all", { method: "DELETE" });
+      await loadBatches();
+    } catch (err: any) {
+      setError(err.message ?? "فشل الحذف");
+    }
+  }
+
   return (
     <main className="main">
-      <h1 className="page-title">استيراد الطلبات</h1>
+      <h1 className="page-title">Historical Conversation Import</h1>
 
       <div className="card" style={{ marginBottom: 16, fontSize: 13, color: "var(--text-dim)" }}>
-        لا يمكن لهذا النظام قراءة أو البحث في محادثات إنستغرام القديمة تلقائيًا (قيد صلاحيات Meta
-        الحالية). لكن استيراد ملفات الطلبات يعمل بشكل مستقل تمامًا عن ذلك، ويحاول محرك المطابقة
-        ربط كل طلب - قديمًا كان أو حديثًا - بأي بيانات محادثة متوفرة محليًا (تم التقاطها فقط من
-        رسائل جديدة بعد تفعيل استقبال الرسائل من صفحة "رسائل إنستغرام").
+        هذا مستورد بيانات عام لملف تُعِدّه أنت بنفسك خارج هذا النظام تمامًا (لا يستدعي هذا المشروع أي
+        Instagram Conversations/Messages API إطلاقًا). يقبل فقط: معرّف المحادثة، معرّف العميل
+        (PSID/IGSID)، رقم الهاتف الموحّد، توقيت الرسالة، معرّف الإعلان المرجعي (referral_ad_id) إن
+        توفر، ومعرّف الصفحة - بلا أي نص رسائل أو أسماء مستخدمين. تُحذف نسخة الملف المرفوعة فور
+        اكتمال المعالجة.
       </div>
 
       {error && (
@@ -277,7 +256,7 @@ export default function ImportsPage() {
 
       {step === "select-file" && (
         <div className="card">
-          <div className="label">اختر ملف الطلبات (xlsx, xls, csv)</div>
+          <div className="label">اختر ملف بيانات المحادثات (xlsx, xls, csv)</div>
           <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" onChange={onFileChosen} disabled={uploading} />
           {uploading && <p style={{ fontSize: 13, color: "var(--text-dim)" }}>جارٍ رفع الملف وقراءته...</p>}
         </div>
@@ -301,23 +280,9 @@ export default function ImportsPage() {
         <div className="card">
           <div className="label">ربط الأعمدة ({filename} - {selectedSheet})</div>
           <p style={{ fontSize: 13, color: "var(--text-dim)" }}>
-            إجمالي الصفوف: {sheetData.totalRows}. تم التعرّف التلقائي على الأعمدة الممكنة - عدّل أي
-            عمود لم يُتعرَّف عليه بشكل صحيح.
+            إجمالي الصفوف: {sheetData.totalRows}. اربط كل عمود بحقله المناسب - عمود المحادثة أو
+            العميل واحد منهما على الأقل مطلوب، وكذلك معرّف الصفحة.
           </p>
-
-          {templates.length > 0 && (
-            <div style={{ display: "flex", gap: 8, alignItems: "center", margin: "10px 0" }}>
-              <span style={{ fontSize: 13 }}>تطبيق قالب محفوظ:</span>
-              <select value={selectedTemplateId} onChange={(e) => applyTemplate(e.target.value)}>
-                <option value="">بدون قالب (استخدم الربط التلقائي)</option>
-                {templates.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
           <div className="table-wrap" style={{ marginBottom: 16 }}>
             <table>
               <thead>
@@ -356,13 +321,9 @@ export default function ImportsPage() {
               </tbody>
             </table>
           </div>
-          <p style={{ fontSize: 12, color: "var(--text-dim)" }}>* يلزم توفر واحد على الأقل من الحقول المعلَّمة بنجمة (اسم الزبون أو رقم الهاتف) لاعتبار الصف صحيحًا.</p>
           <div style={{ display: "flex", gap: 10 }}>
             <button className="btn secondary" onClick={resetWizard}>
               إلغاء
-            </button>
-            <button className="btn secondary" onClick={saveCurrentAsTemplate} disabled={savingTemplate}>
-              {savingTemplate ? "جارٍ الحفظ..." : "حفظ الربط كقالب"}
             </button>
             <button className="btn" onClick={runValidate} disabled={validating}>
               {validating ? "جارٍ المعاينة..." : "معاينة النتائج قبل الاستيراد"}
@@ -380,8 +341,8 @@ export default function ImportsPage() {
               <div className="value">{validation.totalRows}</div>
             </div>
             <div className="card">
-              <div className="label">صفوف صحيحة</div>
-              <div className="value">{validation.validCount}</div>
+              <div className="label">محادثات مُجمَّعة</div>
+              <div className="value">{validation.groupedCount}</div>
             </div>
             <div className="card">
               <div className="label">صفوف ناقصة</div>
@@ -392,13 +353,13 @@ export default function ImportsPage() {
               <div className="value">{validation.errorCount}</div>
             </div>
             <div className="card">
-              <div className="label">مكرّرة محتملة</div>
-              <div className="value">{validation.duplicateCount}</div>
+              <div className="label">تعارضات</div>
+              <div className="value">{validation.conflictCount}</div>
             </div>
           </div>
 
-          {validation.errorCount + validation.missingCount > 0 && (
-            <div className="table-wrap" style={{ marginTop: 16, maxHeight: 240, overflowY: "auto" }}>
+          {(validation.errorCount > 0 || validation.missingCount > 0) && (
+            <div className="table-wrap" style={{ marginTop: 16, maxHeight: 220, overflowY: "auto" }}>
               <table>
                 <thead>
                   <tr>
@@ -420,105 +381,121 @@ export default function ImportsPage() {
             </div>
           )}
 
-          {validation.duplicateCount > 0 && (
-            <div style={{ marginTop: 16 }}>
-              <div className="label">كيف تريد التعامل مع الصفوف المكرّرة؟</div>
-              <label style={{ display: "block", margin: "6px 0" }}>
-                <input
-                  type="radio"
-                  name="dupStrategy"
-                  checked={duplicateStrategy === "skip"}
-                  onChange={() => setDuplicateStrategy("skip")}
-                />{" "}
-                تجاهل المكرر (لا يُستورد)
-              </label>
-              <label style={{ display: "block", margin: "6px 0" }}>
-                <input
-                  type="radio"
-                  name="dupStrategy"
-                  checked={duplicateStrategy === "import_flagged"}
-                  onChange={() => setDuplicateStrategy("import_flagged")}
-                />{" "}
-                استيراده مع علامة مكرر
-              </label>
-              <div className="table-wrap" style={{ marginTop: 8, maxHeight: 180, overflowY: "auto" }}>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>رقم الصف</th>
-                      <th>السبب</th>
+          <div style={{ marginTop: 16 }}>
+            <div className="label">معاينة المحادثات المُجمَّعة (أول 20)</div>
+            <div className="table-wrap" style={{ maxHeight: 260, overflowY: "auto" }}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>معرّف المحادثة</th>
+                    <th>الهاتف</th>
+                    <th>الإعلان المرجعي</th>
+                    <th>عدد الصفوف</th>
+                    <th>تعارضات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {validation.sampleGrouped.map((g) => (
+                    <tr key={g.conversationId}>
+                      <td>{g.conversationId}</td>
+                      <td>{g.normalizedPhone ?? "-"}</td>
+                      <td>{g.referralAdId ?? "-"}</td>
+                      <td>{g.rowCount}</td>
+                      <td>{g.conflicts.length > 0 ? g.conflicts.join(" | ") : "-"}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {validation.duplicates.map((d, i) => (
-                      <tr key={i}>
-                        <td>{d.rowNumber}</td>
-                        <td>{d.reason}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-            <button className="btn secondary" onClick={() => setStep("mapping")}>
-              رجوع لتعديل الربط
-            </button>
-            <button className="btn" onClick={confirmImport} disabled={confirming || validation.validCount === 0}>
-              {confirming ? "جارٍ الاستيراد..." : "تأكيد الاستيراد"}
-            </button>
+          <div style={{ marginTop: 20, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14 }}>
+              <input type="checkbox" checked={confirmChecked} onChange={(e) => setConfirmChecked(e.target.checked)} />
+              راجعت المعاينة أعلاه وأؤكد استيراد هذه البيانات وتشغيل المطابقة عليها.
+            </label>
+            <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+              <button className="btn secondary" onClick={() => setStep("mapping")}>
+                رجوع لتعديل الربط
+              </button>
+              <button className="btn" onClick={confirmImport} disabled={confirming || !confirmChecked || validation.groupedCount === 0}>
+                {confirming ? "جارٍ الاستيراد..." : "تأكيد الاستيراد وتشغيل المطابقة"}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {step === "done" && successMessage && (
+      {step === "done" && resultSummary && (
         <div className="card" style={{ borderColor: "var(--success)" }}>
-          <p style={{ fontSize: 15 }}>{successMessage}</p>
-          <button className="btn" onClick={resetWizard}>
-            استيراد ملف آخر
-          </button>
+          <p style={{ fontSize: 15 }}>
+            تم الاستيراد: {resultSummary.batch.acceptedCount} محادثة مقبولة، {resultSummary.batch.duplicateCount} تعارض/تكرار.
+          </p>
+          <p style={{ fontSize: 14, color: "var(--text-dim)" }}>
+            بعد إعادة تشغيل المطابقة: {resultSummary.attributionSummary.exact} دقيق، {resultSummary.attributionSummary.probable} محتمل،{" "}
+            {resultSummary.attributionSummary.needsReview} يحتاج مراجعة، {resultSummary.attributionSummary.unmatched} غير مطابق.
+          </p>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn" onClick={resetWizard}>
+              استيراد ملف آخر
+            </button>
+            <a className="btn secondary" href="/workspace/attribution" style={{ display: "inline-flex", alignItems: "center" }}>
+              عرض نتائج المطابقة
+            </a>
+          </div>
         </div>
       )}
 
-      <h2 className="page-title" style={{ fontSize: 18, marginTop: 32 }}>
-        سجل ملفات الاستيراد
-      </h2>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 32 }}>
+        <h2 className="page-title" style={{ fontSize: 18, margin: 0 }}>
+          سجل دفعات الاستيراد
+        </h2>
+        {batches.some((b) => !b.deletedAt) && (
+          <button className="btn secondary" onClick={deleteAll}>
+            حذف جميع البيانات المستوردة
+          </button>
+        )}
+      </div>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
               <th>اسم الملف</th>
               <th>تاريخ الرفع</th>
-              <th>رفعه</th>
               <th>الإجمالي</th>
               <th>المقبول</th>
               <th>المرفوض</th>
-              <th>المكرر</th>
+              <th>التعارضات</th>
               <th>الحالة</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            {history.map((f) => (
-              <tr key={f.id}>
-                <td>{f.filename}</td>
-                <td>{new Date(f.uploadedAt).toLocaleString("ar")}</td>
-                <td>{f.uploadedByEmail}</td>
-                <td>{f.rowCount}</td>
-                <td>{f.acceptedCount}</td>
-                <td>{f.rejectedCount}</td>
-                <td>{f.duplicateCount}</td>
+            {batches.map((b) => (
+              <tr key={b.id}>
+                <td>{b.filename}</td>
+                <td>{new Date(b.uploadedAt).toLocaleString("ar")}</td>
+                <td>{b.rowCount}</td>
+                <td>{b.acceptedCount}</td>
+                <td>{b.rejectedCount}</td>
+                <td>{b.duplicateCount}</td>
                 <td>
-                  <span className={`badge ${f.status === "DONE" ? "success" : f.status === "FAILED" ? "danger" : "warning"}`}>
-                    {f.status}
+                  <span className={`badge ${b.status === "DONE" ? "success" : b.status === "DELETED" ? "danger" : "warning"}`}>
+                    {b.status}
                   </span>
+                </td>
+                <td>
+                  {!b.deletedAt && (
+                    <button className="btn secondary" onClick={() => deleteBatch(b.id)}>
+                      حذف
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
-            {history.length === 0 && (
+            {batches.length === 0 && (
               <tr>
-                <td colSpan={8}>لا يوجد أي ملف مستورد بعد.</td>
+                <td colSpan={8}>لا يوجد أي استيراد بعد.</td>
               </tr>
             )}
           </tbody>
