@@ -37,7 +37,7 @@ export function buildApp() {
   app.use(helmet());
   app.use(
     cors({
-      origin: env.nodeEnv === "production" ? [env.publicBaseUrl] : true,
+      origin: env.nodeEnv === "production" ? [env.webPublicBaseUrl] : true,
       credentials: true,
     }),
   );
