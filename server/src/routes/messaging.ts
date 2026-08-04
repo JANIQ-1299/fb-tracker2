@@ -134,6 +134,7 @@ messagingRouter.get("/conversations", async (req: WorkspaceAuthedRequest, res) =
       normalizedPhoneExtracted: c.normalizedPhoneExtracted,
       referralAdNameSnapshot: c.referralAdNameSnapshot,
       referralCampaignNameSnapshot: c.referralCampaignNameSnapshot,
+      videoUrl: c.referralVideoIdSnapshot ? `https://www.facebook.com/watch/?v=${c.referralVideoIdSnapshot}` : null,
       matchStatus: c.matchStatus,
       matchedOrder: c.matchedOrder,
       candidateOrdersJson: c.candidateOrdersJson,

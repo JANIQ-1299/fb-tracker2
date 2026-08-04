@@ -27,6 +27,7 @@ interface ConversationRow {
   normalizedPhoneExtracted: string | null;
   referralAdNameSnapshot: string | null;
   referralCampaignNameSnapshot: string | null;
+  videoUrl: string | null;
   matchStatus: "MATCHED" | "NEEDS_REVIEW" | "UNMATCHED";
   matchedOrder: { id: string; externalOrderId: string | null; customerName: string | null; price: number | null } | null;
   firstMessageAt: string;
@@ -230,6 +231,7 @@ export default function MessagingPage() {
             <tr>
               <th>الهاتف المستخرج</th>
               <th>الإعلان المرجعي</th>
+              <th>الفيديو المصدر</th>
               <th>الحالة</th>
               <th>الطلب المطابَق</th>
               <th>أول رسالة</th>
@@ -242,6 +244,15 @@ export default function MessagingPage() {
                 <td>{c.normalizedPhoneExtracted ?? "-"}</td>
                 <td>{c.referralAdNameSnapshot ?? "-"}</td>
                 <td>
+                  {c.videoUrl ? (
+                    <a href={c.videoUrl} target="_blank" rel="noreferrer">
+                      فتح الفيديو
+                    </a>
+                  ) : (
+                    "-"
+                  )}
+                </td>
+                <td>
                   <span className={`badge ${MATCH_BADGE[c.matchStatus]}`}>{MATCH_LABEL[c.matchStatus]}</span>
                 </td>
                 <td>{c.matchedOrder ? c.matchedOrder.externalOrderId ?? c.matchedOrder.id.slice(0, 8) : "-"}</td>
@@ -251,7 +262,7 @@ export default function MessagingPage() {
             ))}
             {conversations.length === 0 && (
               <tr>
-                <td colSpan={6}>لا توجد محادثات مُلتقَطة بعد.</td>
+                <td colSpan={7}>لا توجد محادثات مُلتقَطة بعد.</td>
               </tr>
             )}
           </tbody>

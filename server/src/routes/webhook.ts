@@ -214,6 +214,14 @@ webhookRouter.post("/meta/messaging", async (req, res) => {
 
   res.sendStatus(200); // رد فوري لتفادي إعادة إرسال Meta للحدث
 
+  // Meta تسمح بعنوان Callback واحد فقط لكل (تطبيق × نوع كائن "page") - لذلك هذا المسار يُستقبِل
+  // كل أحداث "page" (leadgen ورسائل إنستغرام معًا) عند تحديث اشتراك Webhook ليشير إليه فقط.
+  // كل من الدالتين تتجاهل بأمان الشكل غير المعني بها (entry.changes مقابل entry.messaging).
+  try {
+    await handleWebhookPayload(payload);
+  } catch (err) {
+    logger.error({ err: (err as Error).message }, "فشل غير متوقع في معالجة Webhook (leadgen عبر المسار الموحّد)");
+  }
   try {
     await handleMessagingWebhookPayload(payload);
   } catch (err) {
