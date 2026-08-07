@@ -4,12 +4,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "الرئيسية" },
-  { href: "/last-24h", label: "آخر 24 ساعة" },
-  { href: "/ads", label: "تقرير الإعلانات" },
-  { href: "/videos", label: "تقرير الفيديوهات" },
-  { href: "/leads", label: "العملاء" },
-  { href: "/settings", label: "الإعدادات" },
+  { href: "/dashboard", label: "الرئيسية" },
+  { href: "/dashboard/last-24h", label: "آخر 24 ساعة" },
+  { href: "/dashboard/ads", label: "تقرير الإعلانات" },
+  { href: "/dashboard/videos", label: "تقرير الفيديوهات" },
+  { href: "/dashboard/leads", label: "العملاء" },
+  { href: "/dashboard/settings", label: "الإعدادات" },
 ];
 
 export default function Nav() {

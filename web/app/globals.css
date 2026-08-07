@@ -248,3 +248,80 @@ textarea {
   object-fit: cover;
   background: var(--surface-2);
 }
+
+.landing {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 64px 24px 40px;
+}
+
+.landing-hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.landing-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(79, 124, 255, 0.15);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.landing-hero h1 {
+  font-size: 32px;
+  margin: 0 0 16px;
+}
+
+.landing-hero p {
+  color: var(--text-dim);
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.landing-cta {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.landing-cta .btn {
+  padding: 10px 22px;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.landing-followup {
+  text-align: center;
+  color: var(--text-dim);
+  line-height: 1.8;
+  max-width: 620px;
+  margin: 0 auto 40px;
+}
+
+.landing-footer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.landing-footer a:hover {
+  color: var(--text);
+}

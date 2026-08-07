@@ -21,6 +21,7 @@ import { importsRouter } from "./routes/imports.js";
 import { attributionRouter } from "./routes/attribution.js";
 import { messagingRouter } from "./routes/messaging.js";
 import { conversationImportRouter } from "./routes/conversationImport.js";
+import { facebookComplianceRouter } from "./routes/facebookCompliance.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import {
   apiRateLimiter,
@@ -81,6 +82,10 @@ export function buildApp() {
   // ---- Historical Conversation Import: استيراد بيانات محادثة مجرَّدة (بلا نصوص) يرفعها مالك
   // الـWorkspace بنفسه - لا يوجد هنا أي استدعاء لـConversations/Messages API. راجع DECISIONS.md ----
   app.use("/api/conversation-import", apiRateLimiter, conversationImportRouter);
+
+  // ---- استدعاءات داخلية من web/app/facebook/* بعد تحقّقها هي نفسها من توقيع Meta - راجع
+  // server/src/routes/facebookCompliance.ts للتفاصيل (Deauthorize + Data Deletion Callback) ----
+  app.use("/api/facebook", apiRateLimiter, facebookComplianceRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -21,7 +21,7 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password }),
       });
       setToken(res.token);
-      router.replace("/");
+      router.replace("/dashboard");
     } catch (err: any) {
       setError(err.message ?? "فشل تسجيل الدخول");
     } finally {
