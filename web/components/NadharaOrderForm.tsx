@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { submitNadharaOrder } from "../lib/publicApi";
+import { trackLead } from "../lib/pixel";
 
 const GOVERNORATES = [
   "بغداد",
@@ -59,6 +60,7 @@ export default function NadharaOrderForm() {
         notes: String(data.get("notes") ?? "") || undefined,
       });
       setStatus("success");
+      trackLead();
       form.reset();
     } catch (err) {
       setStatus("error");
