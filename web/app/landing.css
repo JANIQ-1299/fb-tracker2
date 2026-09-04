@@ -20,6 +20,10 @@
   font-family: "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
+  /* بدون position هنا، حقل الفخ المخفي (position:absolute; left:-9999px) يتموضع نسبة لـ<body>
+     بدل هذا العنصر فيتجاوز overflow-x:hidden أعلاه، فيولّد مساحة تمرير أفقية فارغة ضخمة (يبين
+     كفراغ على يسار الصفحة بالهاتف). position:relative يخلي هذا العنصر نفسه containing block. */
+  position: relative;
 }
 
 .nadhara-page * {
