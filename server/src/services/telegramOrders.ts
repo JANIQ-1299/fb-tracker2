@@ -55,7 +55,8 @@ interface PendingOrder {
   fbc?: string;
   clientIp?: string;
   userAgent?: string;
-  confirmed: boolean;
+  confirmed: boolean; // صاحبة المتجر ضغطت زر التأكيد (لا يتغير أبدًا بعد أول ضغطة)
+  metaEventSent: boolean; // نجح فعليًا إرسال حدث Purchase لـMeta - إن فشل تبقى false ليمكن إعادة المحاولة بضغطة ثانية
 }
 
 function readOrdersStore(): Record<string, PendingOrder> {
@@ -199,6 +200,7 @@ export async function sendOrderToTelegram(order: NadharaOrder) {
     clientIp: order.clientIp,
     userAgent: order.userAgent,
     confirmed: false,
+    metaEventSent: false,
   };
   writeOrdersStore(store);
 }
@@ -259,8 +261,8 @@ async function handleCallbackQuery(cq: NonNullable<TelegramUpdate["callback_quer
     });
     return;
   }
-  if (order.confirmed) {
-    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم تأكيد هذا الطلب مسبقًا ✅" });
+  if (order.metaEventSent) {
+    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم إرسال هذا الطلب لـMeta مسبقًا ✅" });
     return;
   }
 
@@ -276,7 +278,10 @@ async function handleCallbackQuery(cq: NonNullable<TelegramUpdate["callback_quer
     userAgent: order.userAgent,
   });
 
+  // التأكيد اليدوي (البيع صار فعلًا) لا يتراجع أبدًا حتى لو فشل الإرسال لـMeta؛ metaEventSent
+  // وحده يبقى false عند الفشل حتى يقدر يضغط الزر نفسه مرة ثانية لاحقًا (إعادة محاولة).
   order.confirmed = true;
+  order.metaEventSent = result.sent;
   store[orderId] = order;
   writeOrdersStore(store);
 
@@ -284,16 +289,21 @@ async function handleCallbackQuery(cq: NonNullable<TelegramUpdate["callback_quer
 
   await callTelegram("answerCallbackQuery", {
     callback_query_id: cq.id,
-    text: result.sent ? "✅ تم إرسال حدث الشراء لـMeta" : "⚠️ تعذر الإرسال لـMeta (راجع اللوگ)",
+    text: result.sent
+      ? "✅ تم إرسال حدث الشراء لـMeta"
+      : `⚠️ تعذر الإرسال لـMeta: ${result.reason ?? "خطأ غير معروف"}\nراح تكدرين تضغطين الزر مرة ثانية لاحقًا لإعادة المحاولة`,
     show_alert: !result.sent,
   });
 
   if (cq.message) {
+    const label = result.sent
+      ? "✅ تم التأكيد والإرسال لـMeta"
+      : "⚠️ تم التأكيد - إرسال Meta فشل (اضغطي للمحاولة مجددًا)";
     await callTelegram("editMessageReplyMarkup", {
       chat_id: chatId,
       message_id: cq.message.message_id,
       reply_markup: {
-        inline_keyboard: [[{ text: "✅ تم التأكيد والإرسال لـMeta", callback_data: "noop" }]],
+        inline_keyboard: [[{ text: label, callback_data: result.sent ? "noop" : `confirm:${orderId}` }]],
       },
     });
   }
