@@ -38,9 +38,12 @@ export function buildApp() {
   const app = express();
 
   app.use(helmet());
+  // يدعم عدة نطاقات مفصولة بفاصلة (رابط onrender.com الافتراضي + الدومين المخصص) حتى لا ينكسر
+  // الموقع القديم أثناء انتقال الزبائن تدريجيًا للدومين الجديد.
+  const allowedWebOrigins = env.webPublicBaseUrl.split(",").map((o) => o.trim());
   app.use(
     cors({
-      origin: env.nodeEnv === "production" ? [env.webPublicBaseUrl] : true,
+      origin: env.nodeEnv === "production" ? allowedWebOrigins : true,
       credentials: true,
     }),
   );
