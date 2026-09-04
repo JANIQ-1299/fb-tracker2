@@ -14,8 +14,14 @@ export interface NadharaOrderInput {
   website?: string;
 }
 
+export interface NadharaOrderResult {
+  ok: true;
+  orderId: string;
+  price: number;
+}
+
 // نقطة نهاية عامة بلا مصادقة، لذا لا نستخدم apiFetch (يُرفق توكن ويعيد التوجيه لصفحة الدخول عند 401)
-export async function submitNadharaOrder(input: NadharaOrderInput): Promise<{ ok: true }> {
+export async function submitNadharaOrder(input: NadharaOrderInput): Promise<NadharaOrderResult> {
   const res = await fetch(`${API_BASE}/api/public/nadhara-orders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

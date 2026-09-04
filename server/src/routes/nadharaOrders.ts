@@ -58,5 +58,7 @@ nadharaOrdersRouter.post("/", async (req, res) => {
   );
 
   logger.info({ orderId: record.orderId, phone: record.phone, city: record.city }, "طلب نضارة جديد");
-  res.json({ ok: true });
+  // orderId يرجع للواجهة لاستخدامه كـevent_id بحدث Purchase الفوري بالبكسل، حتى يتطابق مع
+  // نفس الحدث اللي يرسله السيرفر لاحقًا عبر Conversions API عند التأكيد اليدوي بتليجرام
+  res.json({ ok: true, orderId: record.orderId, price: record.price });
 });

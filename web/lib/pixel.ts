@@ -6,10 +6,13 @@ declare global {
   }
 }
 
-// يُستدعى بعد نجاح إرسال نموذج الطلب - يساعد إعلانات Meta تحسّن الاستهداف نحو زبونات حقيقيات
-export function trackLead() {
+// يُستدعى فورًا بعد نجاح إرسال نموذج الطلب - كل زبونة تعبّي الفورم تُحتسب Purchase مباشرة.
+// orderId هو نفسه event_id اللي يرسله السيرفر لاحقًا بحدث Purchase عبر Conversions API عند
+// ضغط زر التأكيد بتليجرام (metaPixelEvents.ts) - نفس الـevent_id يخلي Meta تدمج الحدثين
+// بحدث واحد بدل عدّهم مرتين، مع الاستفادة من دقة الطرفين معًا (توصية Meta الرسمية).
+export function trackPurchase(orderId: string, value: number) {
   if (typeof window !== "undefined" && typeof window.fbq === "function") {
-    window.fbq("track", "Lead");
+    window.fbq("track", "Purchase", { value, currency: "IQD" }, { eventID: orderId });
   }
 }
 
