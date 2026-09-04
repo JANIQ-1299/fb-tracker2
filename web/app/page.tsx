@@ -171,11 +171,11 @@ export default function LandingPage() {
 
         <div className="n-video-grid">
           <div className="n-video-card">
-            <video src="/videos/scrub-usage.mp4" controls playsInline preload="none" />
+            <video src="/videos/scrub-usage.mp4" controls autoPlay muted loop playsInline preload="auto" />
             <span>طريقة استخدام المقشر</span>
           </div>
           <div className="n-video-card">
-            <video src="/videos/cream-usage.mp4" controls playsInline preload="none" />
+            <video src="/videos/cream-usage.mp4" controls autoPlay muted loop playsInline preload="auto" />
             <span>طريقة استخدام الكريم الموحّد</span>
           </div>
         </div>
@@ -222,7 +222,7 @@ export default function LandingPage() {
           <p>قبل وبعد استخدام بكج نضارة</p>
         </div>
         <div className="n-before-after">
-          <video src="/videos/before-after.mp4" controls playsInline preload="none" />
+          <video src="/videos/before-after.mp4" controls autoPlay muted loop playsInline preload="auto" />
         </div>
       </section>
 
