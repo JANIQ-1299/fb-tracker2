@@ -92,10 +92,7 @@ export default function LandingPage() {
             <span className="n-ingredients">نياسيناميد، غلوتاثيون، ألفا أربيوتين، فيتامين سي</span>
           </div>
         </div>
-        <div className="n-gift-banner">
-          <img src="/images/nadhara-lifestyle.jpg" alt="هدية مسك الرمان مع بكج نضارة" />
-          <p className="n-price-gift">🎁 مع كل بكج هدية مسك الرمان</p>
-        </div>
+        <p className="n-price-gift">🎁 مع كل بكج هدية مسك الرمان</p>
       </section>
 
       <section className="n-section">
