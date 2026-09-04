@@ -7,6 +7,9 @@ export interface NadharaOrderInput {
   address: string;
   quantity: number;
   notes?: string;
+  // كوكيز بكسل Meta - لتحسين مطابقة حدث Purchase لاحقًا (راجع lib/pixel.ts)
+  fbp?: string;
+  fbc?: string;
   // حقل فخ مخفي لمكافحة السبام - يجب أن يبقى فارغًا (راجع server/src/routes/nadharaOrders.ts)
   website?: string;
 }

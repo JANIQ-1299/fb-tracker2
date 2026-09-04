@@ -1,7 +1,8 @@
+import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { logger } from "../lib/logger.js";
-import { appendOrderToCsv, sendOrderToTelegram } from "../services/telegramOrders.js";
+import { appendOrderToCsv, priceForQuantity, sendOrderToTelegram } from "../services/telegramOrders.js";
 
 // نقطة نهاية عامة بلا مصادقة لاستقبال طلبات نموذج صفحة هبوط نضارة (web/app/page.tsx).
 // مستقلة تمامًا عن مخطط Lead/Order متعدد المستأجرين - راجع services/telegramOrders.ts.
@@ -14,6 +15,10 @@ const orderSchema = z.object({
   address: z.string().trim().min(5, "الرجاء كتابة العنوان بالتفصيل").max(500),
   quantity: z.coerce.number().int().min(1).max(20).default(1),
   notes: z.string().trim().max(500).optional(),
+  // fbp/fbc: كوكيز بكسل Meta (من متصفح الزائر) - تُستخدم لاحقًا لتحسين جودة مطابقة حدث
+  // Purchase عند تأكيد الطلب (راجع services/metaPixelEvents.ts)
+  fbp: z.string().trim().max(200).optional(),
+  fbc: z.string().trim().max(200).optional(),
   // حقل فخ (honeypot) مخفي بالواجهة - لا قيد بنية عليه هنا حتى لا يظهر كخطأ تحقق للمستخدم؛
   // القيمة تُفحص يدويًا بالأسفل: إن امتلأ فهذا سلوك بوت سبام فنرد نجاحًا صوريًا بصمت
   website: z.string().max(500).optional(),
@@ -25,13 +30,22 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: parsed.error.issues[0]?.message ?? "بيانات غير صحيحة" });
   }
 
-  const { website, ...order } = parsed.data;
+  const { website, fbp, fbc, ...order } = parsed.data;
   if (website) {
     // سبام واضح (حقل الفخ ممتلئ) - رد نجاح صوري بدون أي معالجة فعلية
     return res.json({ ok: true });
   }
 
-  const record = { ...order, receivedAt: new Date() };
+  const record = {
+    ...order,
+    orderId: crypto.randomUUID(),
+    price: priceForQuantity(order.quantity),
+    receivedAt: new Date(),
+    fbp,
+    fbc,
+    clientIp: req.ip,
+    userAgent: req.headers["user-agent"],
+  };
 
   try {
     appendOrderToCsv(record);
@@ -43,6 +57,6 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     logger.error({ err: (err as Error).message }, "فشل إرسال طلب نضارة عبر Telegram"),
   );
 
-  logger.info({ phone: record.phone, city: record.city }, "طلب نضارة جديد");
+  logger.info({ orderId: record.orderId, phone: record.phone, city: record.city }, "طلب نضارة جديد");
   res.json({ ok: true });
 });
