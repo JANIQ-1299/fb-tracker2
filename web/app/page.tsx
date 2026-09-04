@@ -1,6 +1,10 @@
 import "./landing.css";
 import NadharaOrderForm from "../components/NadharaOrderForm";
 
+// يمنع كاش طويل الأمد (سنة كاملة افتراضيًا لصفحات Next الثابتة) عند بروكسيات شركات
+// الاتصالات على الموبايل - بدونه بعض الزبائن يبقون يشوفون نسخة قديمة من الصفحة بعد كل نشر جديد
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "نضارة | الأفضل لكِ - بكج العناية بالبشرة",
   description:
