@@ -1,63 +1,223 @@
+import "./landing.css";
+import NadharaOrderForm from "../components/NadharaOrderForm";
+
 export const metadata = {
-  title: "نضارة - منتجات العناية بالبشرة والتجميل",
+  title: "نضارة | الأفضل لكِ - بكج العناية بالبشرة",
   description:
-    "نضارة، صفحة متخصصة بمنتجات العناية بالبشرة والتجميل في بغداد، العراق. تابعونا على إنستغرام وفيسبوك لأحدث المنتجات والعروض.",
+    "بكج نضارة الكامل للعناية بالبشرة: غسول، مقشر وكريم موحّد للون، بإشراف دكتورة صيدلانية. اطلبي الآن وسنتواصل معك لتأكيد الطلب والتوصيل.",
 };
 
 const CONTACT = {
   instagram: "https://www.instagram.com/nadhara.official/",
   facebook: "https://web.facebook.com/profile.php?id=61591709139686",
-  location: "بغداد، العراق",
-  hours: "يوميًا من 10:00 صباحًا حتى 8:00 مساءً",
-  email: "qamerhussein24@gmail.com",
+  location: "كركوك، شارع القدس سنتر كركوك، الطابق الثاني",
 };
 
 export default function LandingPage() {
   return (
-    <main className="landing">
-      <section className="landing-hero">
-        <span className="landing-badge">نضارة</span>
-        <h1>نضارة لمنتجات العناية بالبشرة والتجميل</h1>
+    <main className="nadhara-page">
+      <div className="n-topbar">
+        <span className="n-logo">نضارة</span>
+        <a className="n-topbar-link" href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
+          تابعينا على إنستقرام
+        </a>
+      </div>
+
+      <section className="n-hero">
+        <span className="n-hero-badge">🌸 الأفضل لكِ</span>
+        <h1>
+          بكج <span>نضارة</span> الكامل للعناية ببشرتك
+        </h1>
         <p>
-          نقدّم مجموعة مختارة من منتجات العناية بالبشرة ومستحضرات التجميل، مع متابعة وتواصل مباشر
-          عبر صفحاتنا على إنستغرام وفيسبوك.
+          نظافة، نعومة، وإشراقة — مجموعة عناية متكاملة بإشراف دكتورة صيدلانية، تساعد بشرتك على
+          التخلص من الجلد الميت وتوحيد لونها بلطف واستمرارية.
         </p>
-        <div className="landing-cta">
-          <a className="btn" href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
-            تابعونا على إنستغرام
+        <div className="n-hero-cta">
+          <a className="n-btn n-btn-primary" href="#order">
+            اطلبي الآن
           </a>
-          <a className="btn secondary" href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
-            صفحتنا على فيسبوك
+          <a
+            className="n-btn n-btn-outline"
+            href={CONTACT.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            شاهدي تجارب الزبونات
           </a>
+        </div>
+        <img className="n-hero-img" src="/images/nadhara-routine.jpg" alt="بكج نضارة: غسول، مقشر وكريم موحّد للون" />
+      </section>
+
+      <section className="n-trust">
+        <div className="n-trust-item">
+          <div className="n-trust-icon">💊</div>
+          <span>بإشراف دكتورة صيدلانية</span>
+        </div>
+        <div className="n-trust-item">
+          <div className="n-trust-icon">🚚</div>
+          <span>توصيل لجميع المحافظات</span>
+        </div>
+        <div className="n-trust-item">
+          <div className="n-trust-icon">💬</div>
+          <span>تواصل مباشر وتأكيد سريع</span>
         </div>
       </section>
 
-      <section className="landing-info">
-        <div className="card">
-          <div className="label">الموقع</div>
-          <div className="value" style={{ fontSize: 16 }}>{CONTACT.location}</div>
+      <section className="n-section">
+        <div className="n-section-title">
+          <h2>شنو يحتوي البكج؟</h2>
+          <p>ثلاث خطوات بسيطة لروتين عناية يومي</p>
         </div>
-        <div className="card">
-          <div className="label">ساعات العمل</div>
-          <div className="value" style={{ fontSize: 16 }}>{CONTACT.hours}</div>
+        <div className="n-package-grid">
+          <div className="n-product-card">
+            <div className="n-product-icon">🧴</div>
+            <h3>غسول</h3>
+            <p>ينظف بعمق ويعتني بالاسمرار والالتهابات وروائح المنطقة.</p>
+            <span className="n-ingredients">نياسيناميد، حمض غليكوليك، فيتامين سي</span>
+          </div>
+          <div className="n-product-card">
+            <div className="n-product-icon">🫧</div>
+            <h3>مقشر</h3>
+            <p>مائي جيلاتيني لطيف يزيل الجلد الميت بدون خدوش أو تهيّج.</p>
+            <span className="n-ingredients">أحماض فواكه من الفراولة، بذور الريحان، فيتامين سي</span>
+          </div>
+          <div className="n-product-card">
+            <div className="n-product-icon">✨</div>
+            <h3>كريم موحّد للون</h3>
+            <p>يعالج التصبغات والاسمرار من أول استخدام، وقوامه مرطب.</p>
+            <span className="n-ingredients">نياسيناميد، غلوتاثيون، ألفا أربيوتين، فيتامين سي</span>
+          </div>
         </div>
-        <div className="card">
-          <div className="label">التواصل</div>
-          <div className="value" style={{ fontSize: 16 }}>{CONTACT.email}</div>
+        <div className="n-gift-banner">
+          <img src="/images/nadhara-lifestyle.jpg" alt="هدية مسك الرمان مع بكج نضارة" />
+          <p className="n-price-gift">🎁 مع كل بكج هدية مسك الرمان</p>
         </div>
       </section>
 
-      <p className="landing-followup">
-        تابعوا «نضارة» على منصات التواصل للاطلاع على أحدث المنتجات والعروض، أو تواصلوا معنا مباشرة
-        للحصول على المزيد من المعلومات.
-      </p>
+      <section className="n-section">
+        <div className="n-section-title">
+          <h2>الأسعار والعروض</h2>
+          <p>اختاري العرض المناسب لچ</p>
+        </div>
+        <div className="n-pricing-grid">
+          <div className="n-price-card">
+            <h3>بكج واحد</h3>
+            <div className="n-price-amount">33,000 د.ع</div>
+            <p>غسول + مقشر + كريم موحّد للون، مع هدية مسك الرمان</p>
+          </div>
+          <div className="n-price-card n-price-highlight">
+            <span className="n-price-tag">الأكثر توفيرًا</span>
+            <h3>بكجين + بكج هدية 🎁</h3>
+            <div className="n-price-amount">65,000 د.ع</div>
+            <div className="n-price-save">توفري 34,000 د.ع</div>
+            <p>٣ بكجات كاملة (بسعر بكجين فقط)، مع هدية مسك الرمان</p>
+          </div>
+        </div>
+      </section>
 
-      <footer className="landing-footer">
-        <a href="/legal/privacy">سياسة الخصوصية</a>
-        <span>·</span>
-        <a href="/legal/terms">الشروط والأحكام</a>
-        <span>·</span>
-        <a href="/legal/data-deletion">حذف البيانات</a>
+      <section className="n-section">
+        <div className="n-section-title">
+          <h2>طريقة الاستخدام</h2>
+          <p>المقشر والغسول 3 أيام بالأسبوع فقط - جربي البداية على منطقة واحدة لتلاحظي الفرق</p>
+        </div>
+        <ol className="n-instructions">
+          <li>
+            <span className="n-instr-num">1</span>
+            <span>كمية بسيطة من المقشر على المنطقة، تدليك لطيف لمدة 10 دقائق، ثم غسل وتجفيف.</span>
+          </li>
+          <li>
+            <span className="n-instr-num">2</span>
+            <span>غسل المنطقة بالغسول وتجفيفها.</span>
+          </li>
+          <li>
+            <span className="n-instr-num">3</span>
+            <span>
+              كمية قليلة جدًا من الكريم الموحّد للون، يوميًا قبل النوم، ويُمنع غسل المنطقة بعد
+              وضعه.
+            </span>
+          </li>
+        </ol>
+
+        <div className="n-section-title" style={{ marginTop: 32 }}>
+          <h2>نصائح مهمة</h2>
+        </div>
+        <ol className="n-instructions">
+          <li>
+            <span className="n-instr-num">•</span>
+            <span>
+              يفضّل إزالة الشعر بالشمع أو الليزر، أو شفرة فينوس البنفسجية إذا كانت الإزالة
+              بالشفرة.
+            </span>
+          </li>
+          <li>
+            <span className="n-instr-num">•</span>
+            <span>الملابس الداخلية قطنية حصرًا وترتديها دائمًا لتجنب الاحتكاك المسبب للاسمرار.</span>
+          </li>
+          <li>
+            <span className="n-instr-num">•</span>
+            <span>تجنّبي منتجات العناية الأخرى (خاصة المعطّرة) ومقشرات الجسم الأخرى أثناء الاستخدام.</span>
+          </li>
+        </ol>
+      </section>
+
+      <section className="n-section">
+        <div className="n-guarantee">
+          <img className="n-guarantee-img" src="/images/nadhara-guarantee.jpg" alt="كرت ضمان المنتج والخدمة - نضارة" />
+          <div className="n-guarantee-icon">🛡️</div>
+          <h3>كرت الضمان</h3>
+          <p>يصل كرت الضمان مع كل بكج - يرجى الاحتفاظ فيه لضمان حقچ كزبونة.</p>
+          <p>
+            استجابة الأجسام تختلف من شخص لآخر، وباستخدام البكج كاملًا مع الالتزام بتعليمات
+            الاستخدام غالبًا راح تشوفين نتيجة مرضية. وفي حال ما حصل فرق واضح بعد إكمال البكج، تواصلي
+            معنا على الخاص.
+          </p>
+        </div>
+      </section>
+
+      <section className="n-section">
+        <div className="n-section-title">
+          <h2>تجارب زبوناتنا 💬</h2>
+          <p>آراء حقيقية من زبونات استخدمن بكج نضارة</p>
+        </div>
+        <div className="n-testimonials n-testimonials-img">
+          <img src="/images/testimonials/t1.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
+          <img src="/images/testimonials/t2.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
+          <img src="/images/testimonials/t3.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
+          <img src="/images/testimonials/t4.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
+          <img src="/images/testimonials/t5.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
+        </div>
+      </section>
+
+      <section className="n-order" id="order">
+        <p className="n-order-warning">
+          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
+        </p>
+        <div className="n-order-card">
+          <div className="n-section-title">
+            <h2>إرسال طلب</h2>
+            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
+          </div>
+          <NadharaOrderForm />
+        </div>
+      </section>
+
+      <footer className="n-footer">
+        <div className="n-footer-social">
+          <a className="n-topbar-link" href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
+            إنستقرام
+          </a>
+          <a className="n-topbar-link" href={CONTACT.facebook} target="_blank" rel="noopener noreferrer">
+            فيسبوك
+          </a>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--n-text-dim)", marginBottom: 14 }}>{CONTACT.location}</p>
+        <div className="n-footer-legal">
+          <a href="/legal/privacy">سياسة الخصوصية</a>
+          <span>·</span>
+          <a href="/legal/terms">الشروط والأحكام</a>
+          <span>·</span>
+          <a href="/legal/data-deletion">حذف البيانات</a>
+        </div>
       </footer>
     </main>
   );

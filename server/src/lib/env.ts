@@ -66,6 +66,11 @@ export const env = {
   googleSheetId: required("GOOGLE_SHEET_ID"),
   googleServiceAccountEmail: required("GOOGLE_SERVICE_ACCOUNT_EMAIL"),
   googleServiceAccountKeyFile: required("GOOGLE_SERVICE_ACCOUNT_KEY_FILE"),
+
+  // بوت تليجرام يستقبل طلبات صفحة هبوط نضارة فور وصولها. TELEGRAM_CHAT_ID اختياري - إن تُرك
+  // فارغًا يُكتشف تلقائيًا من أول رسالة /start يرسلها صاحب المتجر للبوت (راجع jobs/telegramBot.ts).
+  telegramBotToken: required("TELEGRAM_BOT_TOKEN"),
+  telegramChatId: required("TELEGRAM_CHAT_ID"),
 };
 
 export const isMetaConfigured = () =>

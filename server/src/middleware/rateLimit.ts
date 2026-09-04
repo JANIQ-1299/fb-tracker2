@@ -44,3 +44,12 @@ export const webhookRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// نموذج طلب نضارة العام (بلا مصادقة) - سقف صارم لكل IP لمنع السبام على نقطة نهاية مفتوحة للعامة
+export const publicFormRateLimiter = rateLimit({
+  windowMs: 60_000,
+  limit: 8,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "طلبات كثيرة جدًا، الرجاء المحاولة بعد قليل" },
+});

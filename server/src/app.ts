@@ -22,12 +22,14 @@ import { attributionRouter } from "./routes/attribution.js";
 import { messagingRouter } from "./routes/messaging.js";
 import { conversationImportRouter } from "./routes/conversationImport.js";
 import { facebookComplianceRouter } from "./routes/facebookCompliance.js";
+import { nadharaOrdersRouter } from "./routes/nadharaOrders.js";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandler.js";
 import {
   apiRateLimiter,
   authRateLimiter,
   webhookRateLimiter,
   superAdminAuthRateLimiter,
+  publicFormRateLimiter,
 } from "./middleware/rateLimit.js";
 
 // بُني كدالة منفصلة عن index.ts حتى يمكن استيراده في الاختبارات (supertest)
@@ -86,6 +88,10 @@ export function buildApp() {
   // ---- استدعاءات داخلية من web/app/facebook/* بعد تحقّقها هي نفسها من توقيع Meta - راجع
   // server/src/routes/facebookCompliance.ts للتفاصيل (Deauthorize + Data Deletion Callback) ----
   app.use("/api/facebook", apiRateLimiter, facebookComplianceRouter);
+
+  // ---- نموذج طلب صفحة هبوط نضارة (بلا مصادقة) - يرسل كل طلب لبوت تليجرام صاحب المتجر
+  // ويحتفظ بنسخة CSV احتياطية. راجع services/telegramOrders.ts ----
+  app.use("/api/public/nadhara-orders", publicFormRateLimiter, nadharaOrdersRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

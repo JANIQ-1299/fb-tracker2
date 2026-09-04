@@ -5,6 +5,7 @@ import { scheduleInsightsJob } from "./jobs/insights.js";
 import { scheduleSheetsSync } from "./jobs/sheetsSync.js";
 import { scheduleDailyReportJob } from "./jobs/dailyReport.js";
 import { scheduleMessagePurgeJob } from "./jobs/purgeMessageText.js";
+import { scheduleTelegramPolling } from "./jobs/telegramBot.js";
 
 const app = buildApp();
 
@@ -15,5 +16,6 @@ app.listen(env.port, () => {
     scheduleSheetsSync();
     scheduleDailyReportJob();
     scheduleMessagePurgeJob();
+    scheduleTelegramPolling();
   }
 });
