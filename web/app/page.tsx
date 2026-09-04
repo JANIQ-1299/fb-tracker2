@@ -139,6 +139,17 @@ export default function LandingPage() {
           </li>
         </ol>
 
+        <div className="n-video-grid">
+          <div className="n-video-card">
+            <video src="/videos/scrub-usage.mp4" controls playsInline preload="metadata" />
+            <span>طريقة استخدام المقشر</span>
+          </div>
+          <div className="n-video-card">
+            <video src="/videos/cream-usage.mp4" controls playsInline preload="metadata" />
+            <span>طريقة استخدام الكريم الموحّد</span>
+          </div>
+        </div>
+
         <div className="n-section-title" style={{ marginTop: 32 }}>
           <h2>نصائح مهمة</h2>
         </div>
@@ -172,6 +183,16 @@ export default function LandingPage() {
             لهذا: لو خلّصتي البكج الأول وما شفتي نتيجة، نرسلّچ بكج ثاني تعويض مجانًا ونكون وياچ
             خطوة بخطوة. ولو برضو ما شفتي فرق (وهذا نادر جدًا)، نرجّعلچ فلوسچ كاملة.
           </p>
+        </div>
+      </section>
+
+      <section className="n-section">
+        <div className="n-section-title">
+          <h2>شوفي الفرق بعينچ 👀</h2>
+          <p>قبل وبعد استخدام بكج نضارة</p>
+        </div>
+        <div className="n-before-after">
+          <video src="/videos/before-after.mp4" controls playsInline preload="metadata" />
         </div>
       </section>
 
