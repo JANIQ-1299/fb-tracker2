@@ -53,6 +53,19 @@ export default function LandingPage() {
         </a>
       </div>
 
+      <section className="n-order" id="order">
+        <p className="n-order-warning">
+          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
+        </p>
+        <div className="n-order-card">
+          <div className="n-section-title">
+            <h2>إرسال طلب</h2>
+            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
+          </div>
+          <NadharaOrderForm />
+        </div>
+      </section>
+
       <section className="n-hero">
         <span className="n-hero-badge">🌸 الأفضل لكِ</span>
         <h1>
@@ -76,19 +89,6 @@ export default function LandingPage() {
           </a>
         </div>
         <img className="n-hero-img" src="/images/nadhara-routine.jpg" alt="بكج نضارة: غسول، مقشر وكريم موحّد للون" />
-      </section>
-
-      <section className="n-order" id="order">
-        <p className="n-order-warning">
-          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
-        </p>
-        <div className="n-order-card">
-          <div className="n-section-title">
-            <h2>إرسال طلب</h2>
-            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
-          </div>
-          <NadharaOrderForm />
-        </div>
       </section>
 
       <section className="n-trust">
