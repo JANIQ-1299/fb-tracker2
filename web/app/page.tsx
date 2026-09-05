@@ -8,9 +8,9 @@ import { META_PIXEL_ID } from "../lib/pixel";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "نضارة | الأفضل لكِ - بكج العناية بالبشرة",
+  title: "نضارة | الأفضل لكِ - بكج العناية بالمناطق الحساسة",
   description:
-    "بكج نضارة الكامل للعناية بالبشرة: غسول، مقشر وكريم موحّد للون، بإشراف دكتورة صيدلانية. اطلبي الآن وسنتواصل معك لتأكيد الطلب والتوصيل.",
+    "بكج نضارة الكامل للعناية بالمناطق الحساسة: غسول، مقشر وكريم موحّد للون، بإشراف دكتورة صيدلانية. اطلبي الآن وسنتواصل معك لتأكيد الطلب والتوصيل.",
 };
 
 const CONTACT = {
@@ -56,7 +56,7 @@ export default function LandingPage() {
       <section className="n-hero">
         <span className="n-hero-badge">🌸 الأفضل لكِ</span>
         <h1>
-          بكج <span>نضارة</span> الكامل للعناية ببشرتك
+          بكج <span>نضارة</span> الكامل للعناية بالمناطق الحساسة
         </h1>
         <p>
           نظافة، نعومة، وإشراقة — مجموعة عناية متكاملة بإشراف دكتورة صيدلانية، تساعد بشرتك على
@@ -76,6 +76,19 @@ export default function LandingPage() {
           </a>
         </div>
         <img className="n-hero-img" src="/images/nadhara-routine.jpg" alt="بكج نضارة: غسول، مقشر وكريم موحّد للون" />
+      </section>
+
+      <section className="n-order" id="order">
+        <p className="n-order-warning">
+          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
+        </p>
+        <div className="n-order-card">
+          <div className="n-section-title">
+            <h2>إرسال طلب</h2>
+            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
+          </div>
+          <NadharaOrderForm />
+        </div>
       </section>
 
       <section className="n-trust">
@@ -237,19 +250,6 @@ export default function LandingPage() {
           <img src="/images/testimonials/t3.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
           <img src="/images/testimonials/t4.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
           <img src="/images/testimonials/t5.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
-        </div>
-      </section>
-
-      <section className="n-order" id="order">
-        <p className="n-order-warning">
-          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
-        </p>
-        <div className="n-order-card">
-          <div className="n-section-title">
-            <h2>إرسال طلب</h2>
-            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
-          </div>
-          <NadharaOrderForm />
         </div>
       </section>
 
