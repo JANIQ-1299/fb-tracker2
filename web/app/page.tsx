@@ -23,6 +23,7 @@ const CONTACT = {
   instagram: "https://www.instagram.com/nadhara.official/",
   facebook: "https://web.facebook.com/profile.php?id=61591709139686",
   location: "كركوك، شارع القدس سنتر كركوك، الطابق الثاني",
+  whatsapp: "https://wa.me/9647821012076",
 };
 
 export default function LandingPage() {
@@ -280,6 +281,18 @@ export default function LandingPage() {
           <a href="/legal/data-deletion">حذف البيانات</a>
         </div>
       </footer>
+
+      <a
+        className="n-whatsapp-float"
+        href={CONTACT.whatsapp}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="تواصلي معنا عبر واتساب"
+      >
+        <svg viewBox="0 0 32 32" width="30" height="30" fill="currentColor" aria-hidden="true">
+          <path d="M16.004 3C9.377 3 4 8.373 4 15c0 2.323.664 4.49 1.813 6.328L4 29l7.86-1.77A11.94 11.94 0 0 0 16.004 27C22.63 27 28 21.627 28 15S22.63 3 16.004 3Zm6.99 16.87c-.298.837-1.47 1.58-2.02 1.66-.55.08-1.148.26-3.86-.8-3.24-1.29-5.36-4.51-5.52-4.72-.16-.21-1.31-1.74-1.31-3.33 0-1.58.83-2.36 1.13-2.69.3-.33.65-.41.87-.41.22 0 .44 0 .63.01.2.01.47-.08.74.56.28.66.94 2.29 1.02 2.46.08.16.14.36.02.58-.12.22-.18.36-.36.55-.18.2-.38.44-.54.6-.18.17-.37.36-.16.7.21.34.94 1.55 2.02 2.51 1.39 1.24 2.56 1.62 2.9 1.8.34.18.54.15.74-.08.2-.24.85-.99 1.08-1.33.23-.34.46-.28.77-.17.31.11 1.97.93 2.31 1.1.34.17.56.25.65.4.09.15.09.85-.19 1.68Z" />
+        </svg>
+      </a>
     </main>
   );
 }

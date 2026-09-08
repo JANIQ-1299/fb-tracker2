@@ -739,6 +739,28 @@
   color: var(--n-pink-dark);
 }
 
+/* ---- زر واتساب العائم ---- */
+.n-whatsapp-float {
+  position: fixed;
+  bottom: 22px;
+  left: 20px;
+  z-index: 999;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+
+.n-whatsapp-float:hover {
+  transform: scale(1.08);
+}
+
 @media (max-width: 900px) {
   .n-testimonials-img {
     grid-template-columns: repeat(2, 1fr);
