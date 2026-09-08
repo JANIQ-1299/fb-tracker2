@@ -11,7 +11,7 @@ import { logger } from "../lib/logger.js";
  */
 
 // يجب أن يطابق META_PIXEL_ID الثابت في web/lib/pixel.ts
-const PIXEL_ID = "1409019547733349";
+const PIXEL_ID = "2023190068308366";
 
 function sha256(value: string): string {
   return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
