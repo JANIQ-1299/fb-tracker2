@@ -561,6 +561,19 @@
   padding: 0 24px 60px;
 }
 
+.n-order-motivate {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #7a5a1f;
+  background: linear-gradient(135deg, #fdf0d8 0%, #fbe4ea 100%);
+  border: 1.5px solid #f0d9ae;
+  border-radius: 16px;
+  padding: 14px 20px;
+  margin: 0 0 14px;
+  line-height: 1.7;
+}
+
 .n-order-warning {
   text-align: center;
   font-size: 17px;

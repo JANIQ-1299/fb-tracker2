@@ -60,6 +60,9 @@ export default function LandingPage() {
       </div>
 
       <section className="n-order" id="order">
+        <p className="n-order-motivate">
+          🚚 توصيل سريع خلال يوم واحد، وضمان استرجاع كامل إذا ما شفتي نتيجة — جربي نضارة بثقة وبلا أي مخاطرة 💕
+        </p>
         <p className="n-order-warning">
           حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
         </p>
