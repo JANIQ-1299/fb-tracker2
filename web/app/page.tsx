@@ -13,6 +13,12 @@ export const metadata = {
     "بكج نضارة الكامل للعناية بالمناطق الحساسة: غسول، مقشر وكريم موحّد للون، بإشراف دكتورة صيدلانية. اطلبي الآن وسنتواصل معك لتأكيد الطلب والتوصيل.",
 };
 
+// يخلي المتصفح يعرض الصفحة بنفس الألوان الفاتحة دومًا، حتى لو الجهاز أو المتصفح
+// (خصوصًا Chrome أندرويد بميزة التلوين الداكن التلقائي) بوضع الوضع الداكن.
+export const viewport = {
+  colorScheme: "light",
+};
+
 const CONTACT = {
   instagram: "https://www.instagram.com/nadhara.official/",
   facebook: "https://web.facebook.com/profile.php?id=61591709139686",
