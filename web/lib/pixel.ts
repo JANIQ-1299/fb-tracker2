@@ -1,8 +1,10 @@
 export const META_PIXEL_ID = "2023190068308366";
+export const SNAP_PIXEL_ID = "813791b7-c0f0-4f20-b092-ad4ba5e8234c";
 
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
+    snaptr?: (...args: unknown[]) => void;
   }
 }
 
@@ -13,6 +15,9 @@ declare global {
 export function trackPurchase(orderId: string, value: number) {
   if (typeof window !== "undefined" && typeof window.fbq === "function") {
     window.fbq("track", "Purchase", { value, currency: "IQD" }, { eventID: orderId });
+  }
+  if (typeof window !== "undefined" && typeof window.snaptr === "function") {
+    window.snaptr("track", "PURCHASE", { price: value, currency: "IQD", transaction_id: orderId });
   }
 }
 
