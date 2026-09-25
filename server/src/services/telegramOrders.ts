@@ -2,8 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { env } from "../lib/env.js";
 import { logger } from "../lib/logger.js";
-import { sendPurchaseEvent } from "./metaPixelEvents.js";
-import { isSnapConfigured, sendSnapPurchaseEvent } from "./snapEvents.js";
+import { sendSnapPurchaseEvent } from "./snapEvents.js";
 
 /**
  * طلبات صفحة هبوط نضارة (بكج العناية بالبشرة) - لا علاقة لها بمخطط Lead/Order متعدد المستأجرين
@@ -12,7 +11,7 @@ import { isSnapConfigured, sendSnapPurchaseEvent } from "./snapEvents.js";
  * بإرسال الأمر /export للبوت. راجع routes/nadharaOrders.ts وjobs/telegramBot.ts.
  *
  * كل طلب يوصل تليجرام مع زر "تأكيد الطلب" - الضغط عليه (بعد ما تتأكد صاحبة المتجر من البيع
- * هاتفيًا) يرسل حدث Purchase فعلي لـMeta Conversions API (metaPixelEvents.ts)، حتى تتعلم
+ * هاتفيًا) يرسل حدث Purchase فعلي لـSnap Conversions API (snapEvents.ts)، حتى تتعلم
  * الحملات الإعلانية تستهدف ناس يشترون فعلاً، مو بس يعبّون الفورم.
  */
 
@@ -270,67 +269,43 @@ async function handleCallbackQuery(cq: NonNullable<TelegramUpdate["callback_quer
     });
     return;
   }
-  const snapNeeded = isSnapConfigured() && !order.snapEventSent;
-  if (order.metaEventSent && !snapNeeded) {
-    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم إرسال هذا الطلب مسبقًا ✅" });
+  if (order.snapEventSent) {
+    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم إرسال هذا الطلب لسناب مسبقًا ✅" });
     return;
   }
 
-  const metaResult: { sent: boolean; reason?: string } = order.metaEventSent
-    ? { sent: true }
-    : await sendPurchaseEvent({
-        orderId: order.orderId,
-        phone: order.phone,
-        value: order.price,
-        quantity: order.quantity,
-        eventTime: new Date(),
-        fbp: order.fbp,
-        fbc: order.fbc,
-        clientIp: order.clientIp,
-        userAgent: order.userAgent,
-      });
-  const snapResult: { sent: boolean; reason?: string } = snapNeeded
-    ? await sendSnapPurchaseEvent({
-        orderId: order.orderId,
-        phone: order.phone,
-        value: order.price,
-        eventTime: new Date(),
-        scCookie1: order.scid,
-        scClickId: order.scclid,
-        clientIp: order.clientIp,
-        userAgent: order.userAgent,
-      })
-    : { sent: true };
+  const result = await sendSnapPurchaseEvent({
+    orderId: order.orderId,
+    phone: order.phone,
+    value: order.price,
+    eventTime: new Date(),
+    scCookie1: order.scid,
+    scClickId: order.scclid,
+    clientIp: order.clientIp,
+    userAgent: order.userAgent,
+  });
 
-  const result = {
-    sent: metaResult.sent && snapResult.sent,
-    reason: [!metaResult.sent && `Meta: ${metaResult.reason}`, !snapResult.sent && `Snap: ${snapResult.reason}`]
-      .filter(Boolean)
-      .join(" | "),
-  };
-
-  // التأكيد اليدوي (البيع صار فعلًا) لا يتراجع أبدًا حتى لو فشل الإرسال؛ metaEventSent/snapEventSent
-  // يبقى false عند الفشل حتى يقدر يضغط الزر نفسه مرة ثانية لاحقًا (إعادة محاولة).
+  // التأكيد اليدوي (البيع صار فعلًا) لا يتراجع أبدًا حتى لو فشل الإرسال؛ snapEventSent
+  // وحده يبقى false عند الفشل حتى يقدر يضغط الزر نفسه مرة ثانية لاحقًا (إعادة محاولة).
   order.confirmed = true;
-  order.metaEventSent = metaResult.sent;
-  order.snapEventSent = snapResult.sent;
+  order.snapEventSent = result.sent;
   store[orderId] = order;
   writeOrdersStore(store);
 
-  logger.info({ orderId, sent: result.sent, reason: result.reason }, "تأكيد طلب نضارة + إرسال حدث Purchase لـMeta/Snap");
+  logger.info({ orderId, sent: result.sent, reason: result.reason }, "تأكيد طلب نضارة + إرسال حدث Purchase لسناب");
 
   await callTelegram("answerCallbackQuery", {
     callback_query_id: cq.id,
     text: result.sent
-      ? "✅ تم إرسال حدث الشراء لـMeta"
-      : `⚠️ تعذر الإرسال لـMeta: ${result.reason ?? "خطأ غير معروف"}\nراح تكدرين تضغطين الزر مرة ثانية لاحقًا لإعادة المحاولة`,
+      ? "✅ تم إرسال حدث الشراء لسناب"
+      : `⚠️ تعذر الإرسال لسناب: ${result.reason ?? "خطأ غير معروف"}\nراح تكدرين تضغطين الزر مرة ثانية لاحقًا لإعادة المحاولة`,
     show_alert: !result.sent,
   });
 
   if (cq.message) {
     const label = result.sent
-      ? "✅ تم التأكيد والإرسال لـMeta"
-      : "⚠️ تم التأكيد - إرسال Meta فشل (اضغطي للمحاولة مجددًا)";
+      ? "✅ تم التأكيد والإرسال لسناب"
+      : "⚠️ تم التأكيد - إرسال سناب فشل (اضغطي للمحاولة مجددًا)";
     await callTelegram("editMessageReplyMarkup", {
       chat_id: chatId,
       message_id: cq.message.message_id,
