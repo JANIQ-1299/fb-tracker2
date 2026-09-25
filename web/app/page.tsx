@@ -23,7 +23,7 @@ const CONTACT = {
   instagram: "https://www.instagram.com/nadhara.official/",
   facebook: "https://web.facebook.com/profile.php?id=61591709139686",
   location: "كركوك، شارع القدس سنتر كركوك، الطابق الثاني",
-  whatsapp: "https://wa.me/9647821012076",
+  whatsapp: "https://wa.me/9647714632981",
 };
 
 export default function LandingPage() {
