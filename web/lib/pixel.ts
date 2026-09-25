@@ -17,8 +17,23 @@ export function trackPurchase(orderId: string, value: number) {
     window.fbq("track", "Purchase", { value, currency: "IQD" }, { eventID: orderId });
   }
   if (typeof window !== "undefined" && typeof window.snaptr === "function") {
-    window.snaptr("track", "PURCHASE", { price: value, currency: "IQD", transaction_id: orderId });
+    window.snaptr("track", "PURCHASE", {
+      price: value,
+      currency: "IQD",
+      transaction_id: orderId,
+      client_dedup_id: orderId,
+    });
   }
+}
+
+// كوكيز بكسل سناب - تُرسَل مع الطلب لتحسين مطابقة حدث Purchase من السيرفر (Conversions API)
+export function getSnapCookies(): { scid?: string; scclid?: string } {
+  if (typeof document === "undefined") return {};
+  const read = (name: string): string | undefined => {
+    const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return match ? decodeURIComponent(match[1]) : undefined;
+  };
+  return { scid: read("_scid"), scclid: read("_scclid") };
 }
 
 // كوكيز البكسل (_fbp دائمًا موجود بعد تحميل البكسل، _fbc فقط إذا وصلت الزائرة عبر رابط إعلان)

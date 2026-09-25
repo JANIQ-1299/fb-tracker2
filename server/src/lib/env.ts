@@ -71,6 +71,9 @@ export const env = {
   // فارغًا يُكتشف تلقائيًا من أول رسالة /start يرسلها صاحب المتجر للبوت (راجع jobs/telegramBot.ts).
   telegramBotToken: required("TELEGRAM_BOT_TOKEN"),
   telegramChatId: required("TELEGRAM_CHAT_ID"),
+
+  // توكن Snap Conversions API - اختياري؛ بدونه يُتخطّى إرسال Purchase لسناب بصمت
+  snapCapiToken: required("SNAP_CAPI_TOKEN"),
 };
 
 export const isMetaConfigured = () =>

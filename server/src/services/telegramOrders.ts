@@ -3,6 +3,7 @@ import path from "node:path";
 import { env } from "../lib/env.js";
 import { logger } from "../lib/logger.js";
 import { sendPurchaseEvent } from "./metaPixelEvents.js";
+import { isSnapConfigured, sendSnapPurchaseEvent } from "./snapEvents.js";
 
 /**
  * طلبات صفحة هبوط نضارة (بكج العناية بالبشرة) - لا علاقة لها بمخطط Lead/Order متعدد المستأجرين
@@ -53,10 +54,13 @@ interface PendingOrder {
   receivedAt: string;
   fbp?: string;
   fbc?: string;
+  scid?: string;
+  scclid?: string;
   clientIp?: string;
   userAgent?: string;
   confirmed: boolean; // صاحبة المتجر ضغطت زر التأكيد (لا يتغير أبدًا بعد أول ضغطة)
   metaEventSent: boolean; // نجح فعليًا إرسال حدث Purchase لـMeta - إن فشل تبقى false ليمكن إعادة المحاولة بضغطة ثانية
+  snapEventSent?: boolean; // نفس الفكرة لسناب (يُتجاهل إن لم يُضبط SNAP_CAPI_TOKEN)
 }
 
 function readOrdersStore(): Record<string, PendingOrder> {
@@ -92,6 +96,8 @@ export interface NadharaOrder {
   receivedAt: Date;
   fbp?: string;
   fbc?: string;
+  scid?: string;
+  scclid?: string;
   clientIp?: string;
   userAgent?: string;
 }
@@ -197,10 +203,13 @@ export async function sendOrderToTelegram(order: NadharaOrder) {
     receivedAt: order.receivedAt.toISOString(),
     fbp: order.fbp,
     fbc: order.fbc,
+    scid: order.scid,
+    scclid: order.scclid,
     clientIp: order.clientIp,
     userAgent: order.userAgent,
     confirmed: false,
     metaEventSent: false,
+    snapEventSent: false,
   };
   writeOrdersStore(store);
 }
@@ -261,31 +270,54 @@ async function handleCallbackQuery(cq: NonNullable<TelegramUpdate["callback_quer
     });
     return;
   }
-  if (order.metaEventSent) {
-    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم إرسال هذا الطلب لـMeta مسبقًا ✅" });
+  const snapNeeded = isSnapConfigured() && !order.snapEventSent;
+  if (order.metaEventSent && !snapNeeded) {
+    await callTelegram("answerCallbackQuery", { callback_query_id: cq.id, text: "تم إرسال هذا الطلب مسبقًا ✅" });
     return;
   }
 
-  const result = await sendPurchaseEvent({
-    orderId: order.orderId,
-    phone: order.phone,
-    value: order.price,
-    quantity: order.quantity,
-    eventTime: new Date(),
-    fbp: order.fbp,
-    fbc: order.fbc,
-    clientIp: order.clientIp,
-    userAgent: order.userAgent,
-  });
+  const metaResult: { sent: boolean; reason?: string } = order.metaEventSent
+    ? { sent: true }
+    : await sendPurchaseEvent({
+        orderId: order.orderId,
+        phone: order.phone,
+        value: order.price,
+        quantity: order.quantity,
+        eventTime: new Date(),
+        fbp: order.fbp,
+        fbc: order.fbc,
+        clientIp: order.clientIp,
+        userAgent: order.userAgent,
+      });
+  const snapResult: { sent: boolean; reason?: string } = snapNeeded
+    ? await sendSnapPurchaseEvent({
+        orderId: order.orderId,
+        phone: order.phone,
+        value: order.price,
+        eventTime: new Date(),
+        scCookie1: order.scid,
+        scClickId: order.scclid,
+        clientIp: order.clientIp,
+        userAgent: order.userAgent,
+      })
+    : { sent: true };
 
-  // التأكيد اليدوي (البيع صار فعلًا) لا يتراجع أبدًا حتى لو فشل الإرسال لـMeta؛ metaEventSent
-  // وحده يبقى false عند الفشل حتى يقدر يضغط الزر نفسه مرة ثانية لاحقًا (إعادة محاولة).
+  const result = {
+    sent: metaResult.sent && snapResult.sent,
+    reason: [!metaResult.sent && `Meta: ${metaResult.reason}`, !snapResult.sent && `Snap: ${snapResult.reason}`]
+      .filter(Boolean)
+      .join(" | "),
+  };
+
+  // التأكيد اليدوي (البيع صار فعلًا) لا يتراجع أبدًا حتى لو فشل الإرسال؛ metaEventSent/snapEventSent
+  // يبقى false عند الفشل حتى يقدر يضغط الزر نفسه مرة ثانية لاحقًا (إعادة محاولة).
   order.confirmed = true;
-  order.metaEventSent = result.sent;
+  order.metaEventSent = metaResult.sent;
+  order.snapEventSent = snapResult.sent;
   store[orderId] = order;
   writeOrdersStore(store);
 
-  logger.info({ orderId, sent: result.sent, reason: result.reason }, "تأكيد طلب نضارة + إرسال حدث Purchase لـMeta");
+  logger.info({ orderId, sent: result.sent, reason: result.reason }, "تأكيد طلب نضارة + إرسال حدث Purchase لـMeta/Snap");
 
   await callTelegram("answerCallbackQuery", {
     callback_query_id: cq.id,

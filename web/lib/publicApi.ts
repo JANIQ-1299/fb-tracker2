@@ -10,6 +10,9 @@ export interface NadharaOrderInput {
   // كوكيز بكسل Meta - لتحسين مطابقة حدث Purchase لاحقًا (راجع lib/pixel.ts)
   fbp?: string;
   fbc?: string;
+  // كوكيز بكسل سناب (راجع lib/pixel.ts)
+  scid?: string;
+  scclid?: string;
   // حقل فخ مخفي لمكافحة السبام - يجب أن يبقى فارغًا (راجع server/src/routes/nadharaOrders.ts)
   website?: string;
 }

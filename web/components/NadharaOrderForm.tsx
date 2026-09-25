@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { submitNadharaOrder } from "../lib/publicApi";
-import { trackPurchase, getFacebookCookies } from "../lib/pixel";
+import { trackPurchase, getFacebookCookies, getSnapCookies } from "../lib/pixel";
 
 const GOVERNORATES = [
   "بغداد",
@@ -52,6 +52,7 @@ export default function NadharaOrderForm() {
     setErrorMessage("");
     try {
       const { fbp, fbc } = getFacebookCookies();
+      const { scid, scclid } = getSnapCookies();
       const result = await submitNadharaOrder({
         name: String(data.get("name") ?? ""),
         phone: String(data.get("phone") ?? ""),
@@ -61,6 +62,8 @@ export default function NadharaOrderForm() {
         notes: String(data.get("notes") ?? "") || undefined,
         fbp,
         fbc,
+        scid,
+        scclid,
       });
       setStatus("success");
       trackPurchase(result.orderId, result.price);

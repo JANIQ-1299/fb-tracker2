@@ -19,6 +19,9 @@ const orderSchema = z.object({
   // Purchase عند تأكيد الطلب (راجع services/metaPixelEvents.ts)
   fbp: z.string().trim().max(200).optional(),
   fbc: z.string().trim().max(200).optional(),
+  // كوكيز بكسل سناب (_scid / _scclid) لتحسين مطابقة حدث Purchase لسناب
+  scid: z.string().trim().max(200).optional(),
+  scclid: z.string().trim().max(300).optional(),
   // حقل فخ (honeypot) مخفي بالواجهة - لا قيد بنية عليه هنا حتى لا يظهر كخطأ تحقق للمستخدم؛
   // القيمة تُفحص يدويًا بالأسفل: إن امتلأ فهذا سلوك بوت سبام فنرد نجاحًا صوريًا بصمت
   website: z.string().max(500).optional(),
@@ -30,7 +33,7 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     return res.status(400).json({ error: parsed.error.issues[0]?.message ?? "بيانات غير صحيحة" });
   }
 
-  const { website, fbp, fbc, ...order } = parsed.data;
+  const { website, fbp, fbc, scid, scclid, ...order } = parsed.data;
   if (website) {
     // سبام واضح (حقل الفخ ممتلئ) - رد نجاح صوري بدون أي معالجة فعلية
     return res.json({ ok: true });
@@ -43,6 +46,8 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     receivedAt: new Date(),
     fbp,
     fbc,
+    scid,
+    scclid,
     clientIp: req.ip,
     userAgent: req.headers["user-agent"],
   };
