@@ -73,7 +73,7 @@ export const env = {
   telegramChatId: required("TELEGRAM_CHAT_ID"),
 
   // توكن Snap Conversions API - اختياري؛ بدونه يُتخطّى إرسال Purchase لسناب بصمت
-  snapCapiToken: required("SNAP_CAPI_TOKEN"),
+  snapCapiToken: required("SNAP_CAPI_TOKEN").trim().replace(/^["']|["']$/g, ""),
 };
 
 export const isMetaConfigured = () =>
