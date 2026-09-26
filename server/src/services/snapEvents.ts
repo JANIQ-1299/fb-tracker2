@@ -19,6 +19,48 @@ function normalizeIraqPhone(raw: string): string {
 
 export const isSnapConfigured = () => Boolean(env.snapCapiToken);
 
+// تشخيص فقط: يستدعي نقطة /validate (لا تسجّل أي حدث) بطريقتي مصادقة ويعيد حالة الرد وشكل التوكن
+// دون كشف قيمته. يُستخدم لمعرفة سبب رفض سناب للتوكن بدون إرسال مبيعة حقيقية.
+export async function diagnoseSnapToken() {
+  const token = env.snapCapiToken;
+  const shape = {
+    configured: Boolean(token),
+    length: token.length,
+    jwtSegments: token ? token.split(".").length : 0,
+    startsWithEyJ: token.startsWith("eyJ"),
+    hasWhitespace: /\s/.test(token),
+  };
+  if (!token) return { shape };
+
+  const body = JSON.stringify({
+    data: [
+      {
+        event_name: "PURCHASE",
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: "diagnostic-check",
+        action_source: "WEB",
+        event_source_url: "https://www.nadharaofficial.com/",
+        user_data: { ph: [sha256("9647700000000")] },
+        custom_data: { currency: "IQD", value: 33000, order_id: "diagnostic-check" },
+      },
+    ],
+  });
+  const base = `https://tr.snapchat.com/v3/${SNAP_PIXEL_ID}/events/validate`;
+  const attempt = async (url: string, headers: Record<string, string>) => {
+    try {
+      const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json", ...headers }, body });
+      return { status: res.status, body: (await res.text()).slice(0, 300) };
+    } catch (err) {
+      return { status: 0, body: (err as Error).message };
+    }
+  };
+  return {
+    shape,
+    queryParam: await attempt(`${base}?access_token=${encodeURIComponent(token)}`, {}),
+    bearerHeader: await attempt(base, { Authorization: `Bearer ${token}` }),
+  };
+}
+
 export interface SnapPurchaseInput {
   orderId: string;
   phone: string;

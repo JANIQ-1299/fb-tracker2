@@ -1,8 +1,13 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { env, isMetaConfigured } from "../lib/env.js";
+import { diagnoseSnapToken } from "../services/snapEvents.js";
 
 export const healthRouter = Router();
+
+healthRouter.get("/health/snap-check", async (_req, res) => {
+  res.json(await diagnoseSnapToken());
+});
 
 healthRouter.get("/health", async (_req, res) => {
   let dbStatus = "connected";
