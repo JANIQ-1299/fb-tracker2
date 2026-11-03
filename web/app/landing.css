@@ -788,3 +788,35 @@
     padding: 24px 18px;
   }
 }
+
+.n-intro {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 24px;
+  max-width: 1056px;
+  margin: 24px auto;
+  padding-inline: 16px;
+}
+
+.n-intro-product {
+  overflow: hidden;
+  border-radius: 24px;
+  background: #fff4f6;
+  color: #431f2b;
+}
+
+.n-intro-product > div { padding: 20px; }
+.n-intro-photo { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
+.n-intro-product h1 { font-size: clamp(20px, 3vw, 34px); line-height: 1.35; margin: 8px 0; }
+.n-intro-product p { margin: 0 0 8px; }
+.n-intro-product strong { color: #852848; }
+.n-intro .n-order { width: 100%; max-width: none; padding: 0; margin: 0; }
+
+@media (max-width: 640px) {
+  .n-intro { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-block: 12px; }
+  .n-intro-product { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; }
+  .n-intro-photo { aspect-ratio: 1; }
+  .n-intro-product > div { padding: 12px; }
+  .n-intro .n-field :is(input, select, textarea) { font-size: 16px; min-height: 44px; }
+}

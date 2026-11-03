@@ -29,7 +29,6 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 const PACKAGE_OPTIONS = [
   { qty: 1, label: "بكج واحد", price: "33,000 د.ع" },
-  { qty: 3, label: "عرض بكجين + بكج هدية 🎁 (٣ بكجات)", price: "65,000 د.ع" },
 ];
 
 export default function NadharaOrderForm() {

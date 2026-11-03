@@ -72,46 +72,26 @@ export default function LandingPage() {
         </a>
       </div>
 
-      <section className="n-order" id="order">
-        <p className="n-order-motivate">
-          🚚 توصيل سريع خلال يوم واحد، وضمان استرجاع كامل إذا ما شفتي نتيجة — جربي نضارة بثقة وبلا أي مخاطرة 💕
-        </p>
-        <p className="n-order-warning">
-          حبيبتي رجاءًا، إذا ما تنوين تحجزين لا تعبّي معلوماتچ بالاستمارة 💔
-        </p>
-        <div className="n-order-card">
-          <div className="n-section-title">
-            <h2>إرسال طلب</h2>
-            <p>عبّي بياناتك وراح نتواصل معك لتأكيد الطلب والتوصيل</p>
+      <div className="n-intro">
+        <section className="n-intro-product" aria-labelledby="product-title">
+          <img className="n-intro-photo" src="/images/nadhara-routine.jpg" alt="بكج نضارة" fetchPriority="high" />
+          <div>
+            <span className="n-hero-badge">نضارة للعناية</span>
+            <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
+            <p>غسول، مقشر وكريم في بكج واحد.</p>
+            <strong>٣٣٬٠٠٠ د.ع شامل التوصيل</strong>
           </div>
-          <NadharaOrderForm />
-        </div>
-      </section>
-
-      <section className="n-hero">
-        <span className="n-hero-badge">🌸 الأفضل لكِ</span>
-        <h1>
-          بكج <span>نضارة</span> الكامل للعناية بالمناطق الحساسة
-        </h1>
-        <p>
-          نظافة، نعومة، وإشراقة — مجموعة عناية متكاملة بإشراف دكتورة صيدلانية، تساعد بشرتك على
-          التخلص من الجلد الميت وتوحيد لونها بلطف واستمرارية.
-        </p>
-        <div className="n-hero-cta">
-          <a className="n-btn n-btn-primary" href="#order">
-            اطلبي الآن
-          </a>
-          <a
-            className="n-btn n-btn-outline"
-            href={CONTACT.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            شاهدي تجارب الزبونات
-          </a>
-        </div>
-        <img className="n-hero-img" src="/images/nadhara-routine.jpg" alt="بكج نضارة: غسول، مقشر وكريم موحّد للون" />
-      </section>
+        </section>
+        <section className="n-order" id="order" aria-labelledby="order-title">
+          <div className="n-order-card">
+            <div className="n-section-title">
+              <h2 id="order-title">اطلبي بكج نضارة</h2>
+              <p>عبّي بياناتك وراح نتواصل وياچ لتأكيد الطلب.</p>
+            </div>
+            <NadharaOrderForm />
+          </div>
+        </section>
+      </div>
 
       <section className="n-trust">
         <div className="n-trust-item">
@@ -206,11 +186,11 @@ export default function LandingPage() {
 
         <div className="n-video-grid">
           <div className="n-video-card">
-            <video src="/videos/scrub-usage.mp4" controls autoPlay muted loop playsInline preload="auto" />
+            <video src="/videos/scrub-usage.mp4" controls playsInline preload="none" />
             <span>طريقة استخدام المقشر</span>
           </div>
           <div className="n-video-card">
-            <video src="/videos/cream-usage.mp4" controls autoPlay muted loop playsInline preload="auto" />
+            <video src="/videos/cream-usage.mp4" controls playsInline preload="none" />
             <span>طريقة استخدام الكريم الموحّد</span>
           </div>
         </div>
@@ -257,7 +237,7 @@ export default function LandingPage() {
           <p>قبل وبعد استخدام بكج نضارة</p>
         </div>
         <div className="n-before-after">
-          <video src="/videos/before-after.mp4" controls autoPlay muted loop playsInline preload="auto" />
+          <video src="/videos/before-after.mp4" controls playsInline preload="none" />
         </div>
       </section>
 
