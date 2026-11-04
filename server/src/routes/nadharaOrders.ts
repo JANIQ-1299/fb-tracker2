@@ -1,3 +1,4 @@
+import { sendPurchaseEvent } from "../services/metaPixelEvents.js";
 import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
@@ -63,7 +64,12 @@ nadharaOrdersRouter.post("/", async (req, res) => {
   );
 
   logger.info({ orderId: record.orderId, phone: record.phone, city: record.city }, "طلب نضارة جديد");
-  // orderId يرجع للواجهة لاستخدامه كـevent_id بحدث Purchase الفوري بالبكسل، حتى يتطابق مع
-  // نفس الحدث اللي يرسله السيرفر لاحقًا عبر Conversions API عند التأكيد اليدوي بتليجرام
+  void sendPurchaseEvent({
+    ...record,
+    value: record.price,
+    eventTime: record.receivedAt,
+  }).then(({ sent, reason }) => {
+    if (!sent) logger.warn({ orderId: record.orderId, reason }, "Meta Purchase delivery failed");
+  });
   res.json({ ok: true, orderId: record.orderId, price: record.price });
 });

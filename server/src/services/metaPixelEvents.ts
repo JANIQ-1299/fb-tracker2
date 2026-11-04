@@ -2,13 +2,7 @@ import crypto from "node:crypto";
 import { env } from "../lib/env.js";
 import { logger } from "../lib/logger.js";
 
-/**
- * Conversions API (خادم-لخادم) لحدث Purchase الفعلي لبكسل نضارة - منفصل تمامًا عن
- * services/capi.ts (الذي يخدم "Conversion Leads Integration" لعملاء Meta Lead Ads عبر
- * Dataset مختلف). هذا الملف يرسل لنفس البكسل المثبّت بصفحة الهبوط (web/lib/pixel.ts) حتى
- * تتوحّد البيانات بـEvents Manager. يُستدعى فقط بعد ما صاحبة المتجر تؤكد البيع الفعلي عبر
- * زر التأكيد بتليجرام - راجع services/telegramOrders.ts.
- */
+// Sends the same website Purchase event as the browser pixel.
 
 // يجب أن يطابق META_PIXEL_ID الثابت في web/lib/pixel.ts
 const PIXEL_ID = "2023190068308366";
@@ -30,8 +24,9 @@ export interface PurchaseEventInput {
 }
 
 export async function sendPurchaseEvent(evt: PurchaseEventInput): Promise<{ sent: boolean; reason?: string }> {
-  if (!env.metaPageAccessToken) {
-    return { sent: false, reason: "META_PAGE_ACCESS_TOKEN غير موجود" };
+  const token = process.env.NADHARA_META_CAPI_TOKEN?.trim();
+  if (!token) {
+    return { sent: false, reason: "NADHARA_META_CAPI_TOKEN غير موجود" };
   }
 
   const userData: Record<string, unknown> = {
@@ -48,8 +43,8 @@ export async function sendPurchaseEvent(evt: PurchaseEventInput): Promise<{ sent
         event_name: "Purchase",
         event_time: Math.floor(evt.eventTime.getTime() / 1000),
         event_id: evt.orderId,
-        // البيع يُؤكَّد فعليًا عبر مكالمة هاتفية بعد إرسال الفورم، وليس لحظة تصفح الموقع
-        action_source: "phone_call",
+        action_source: "website",
+        event_source_url: "https://www.nadharaofficial.com/order",
         user_data: userData,
         custom_data: {
           currency: "IQD",
@@ -66,11 +61,12 @@ export async function sendPurchaseEvent(evt: PurchaseEventInput): Promise<{ sent
   try {
     const res = await fetch(url, {
       method: "POST",
+      signal: AbortSignal.timeout(5000),
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, access_token: env.metaPageAccessToken }),
+      body: JSON.stringify({ ...payload, access_token: token }),
     });
-    const data = (await res.json()) as { error?: { message?: string } };
-    if (!res.ok || data.error) {
+    const data = (await res.json()) as { events_received?: number; error?: { message?: string } };
+    if (!res.ok || data.error || !data.events_received) {
       logger.error({ fbError: data.error }, "فشل إرسال حدث Purchase لـMeta Conversions API");
       return { sent: false, reason: data.error?.message ?? "خطأ غير معروف من Meta" };
     }
