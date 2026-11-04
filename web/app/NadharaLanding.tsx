@@ -1,3 +1,4 @@
+import ProductGallery from "../components/ProductGallery";
 import Script from "next/script";
 import "./landing.css";
 import NadharaOrderForm from "../components/NadharaOrderForm";
@@ -74,7 +75,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <div className="n-intro">
         <section className="n-intro-product" aria-labelledby="product-title">
-          <img className="n-intro-photo" src="/images/nadhara-khtwat.jpg" alt="بكج نضارة" fetchPriority="high" />
+          <ProductGallery />
           <div>
             <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
@@ -92,22 +93,6 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
           </div>
         </section>
       </div>
-
-      <section className="n-section" aria-labelledby="gallery-title">
-        <div className="n-section-title">
-          <h2 id="gallery-title">صور بكج نضارة</h2>
-        </div>
-        <div className="n-product-gallery">
-          <figure>
-            <img src="/images/nadhara-khtwat.jpg" alt="الصورة الرسمية لبكج نضارة" />
-            <figcaption>بكج نضارة الكامل</figcaption>
-          </figure>
-          <figure>
-            <img src="/images/nadhara-lifestyle.jpg" alt="عبوات الغسول والمقشر والكريم ومسك الرمان" loading="lazy" />
-            <figcaption>تفاصيل العبوات</figcaption>
-          </figure>
-        </div>
-      </section>
 
       <section className="n-trust">
         <div className="n-trust-item">
