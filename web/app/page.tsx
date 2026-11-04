@@ -1,3 +1,4 @@
+import ProductCollection from "../components/ProductCollection";
 import "./landing.css";
 
 export default function Home() {
@@ -5,7 +6,7 @@ export default function Home() {
     <main className="nadhara-page">
       <header className="n-topbar">
         <span className="n-logo">نضارة</span>
-        <a className="n-topbar-link" href="https://www.instagram.com/nadhara.official/">إنستقرام</a>
+        <a className="n-topbar-link" href="/products">المنتجات</a>
       </header>
       <section className="n-intro n-home-intro" aria-labelledby="home-title">
         <img className="n-intro-photo" src="/images/nadhara-routine.jpg" alt="مجموعة نضارة للعناية" fetchPriority="high" />
@@ -17,6 +18,7 @@ export default function Home() {
           <p>الأسعار تبدأ من ٣٣٬٠٠٠ د.ع مع توصيل مجاني.</p>
         </div>
       </section>
+      <ProductCollection titleLevel="h2" />
       <footer className="n-footer">
         <a href="/legal/privacy">سياسة الخصوصية</a>
       </footer>

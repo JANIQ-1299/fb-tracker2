@@ -1,5 +1,6 @@
 "use client";
 
+import { PACKAGE_OPTIONS } from "../lib/nadharaPackages";
 import { useState, type FormEvent } from "react";
 import { submitNadharaOrder } from "../lib/publicApi";
 import { trackPurchase, getFacebookCookies, getSnapCookies } from "../lib/pixel";
@@ -27,16 +28,12 @@ const GOVERNORATES = [
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const PACKAGE_OPTIONS = [
-  { qty: 1, label: "بكج واحد", price: "33,000 د.ع" },
-  { qty: 2, label: "بكجين", price: "60,000 د.ع" },
-  { qty: 3, label: "٣ بكجات", price: "81,000 د.ع" },
-];
 
-export default function NadharaOrderForm() {
+
+export default function NadharaOrderForm({ initialQuantity }: { initialQuantity: number }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [selectedQty, setSelectedQty] = useState(1);
+  const [selectedQty, setSelectedQty] = useState(PACKAGE_OPTIONS.find(({ qty }) => qty === initialQuantity)?.qty ?? 1);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();

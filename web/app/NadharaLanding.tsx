@@ -26,7 +26,7 @@ const CONTACT = {
   whatsapp: "https://wa.me/9647714632981",
 };
 
-export default function LandingPage() {
+export default function LandingPage({ searchParams }: { searchParams?: { package?: string | string[] } }) {
   return (
     <main className="nadhara-page">
       <Script id="meta-pixel" strategy="afterInteractive">
@@ -88,7 +88,7 @@ export default function LandingPage() {
               <h2 id="order-title">اطلبي بكج نضارة</h2>
               <p>عبّي بياناتك وراح نتواصل وياچ لتأكيد الطلب.</p>
             </div>
-            <NadharaOrderForm />
+            <NadharaOrderForm initialQuantity={Number(searchParams?.package)} />
           </div>
         </section>
       </div>

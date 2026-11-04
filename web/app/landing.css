@@ -883,3 +883,15 @@
 @media (max-width: 640px) {
   .n-intro-product .n-intro-photo { max-height: 350px; }
 }
+
+.n-catalog { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.n-catalog-card { overflow: hidden; background: var(--n-surface); border: 1px solid var(--n-border); border-radius: var(--n-radius); }
+.n-catalog-card img { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--n-pink-lighter); }
+.n-catalog-card > div { padding: 18px; }
+.n-catalog-card strong { color: var(--n-pink-dark); }
+@media (max-width: 640px) {
+  .n-catalog { grid-template-columns: 1fr; }
+  .n-catalog-card { display: grid; grid-template-columns: minmax(90px, 35%) minmax(0, 1fr); align-items: center; }
+  .n-catalog-card > div { padding: 12px; }
+  .n-catalog-card .n-home-order { padding-inline: 10px; }
+}
