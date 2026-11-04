@@ -919,3 +919,4 @@
 @media (max-width: 480px) {
   .n-product-gallery { grid-template-columns: 1fr; }
 }
+.n-catalog-single { max-width: 420px; margin-inline: auto; }
