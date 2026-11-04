@@ -96,6 +96,27 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         className="n-hp"
       />
 
+      <label className="n-field n-field-wide">
+        <span>اختاري الكمية</span>
+        <select
+          name="quantity"
+          required
+          value={selectedQty}
+          onChange={(e) => setSelectedQty(Number(e.target.value))}
+        >
+          {PACKAGE_OPTIONS.map((opt) => (
+            <option key={opt.qty} value={opt.qty}>
+              {opt.label} — {opt.price}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <div className="n-price-line n-field-wide" aria-live="polite">
+        <span>السعر الإجمالي</span>
+        <strong>{PACKAGE_OPTIONS.find((o) => o.qty === selectedQty)?.price}</strong>
+      </div>
+
       <label className="n-field">
         <span>الاسم الكامل</span>
         <input type="text" name="name" required minLength={2} maxLength={100} placeholder="مثال: زهراء أحمد" />
@@ -127,27 +148,6 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
           ))}
         </select>
       </label>
-
-      <label className="n-field n-field-wide">
-        <span>الباقة</span>
-        <select
-          name="quantity"
-          required
-          value={selectedQty}
-          onChange={(e) => setSelectedQty(Number(e.target.value))}
-        >
-          {PACKAGE_OPTIONS.map((opt) => (
-            <option key={opt.qty} value={opt.qty}>
-              {opt.label} — {opt.price}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div className="n-price-line n-field-wide">
-        <span>السعر الإجمالي</span>
-        <strong>{PACKAGE_OPTIONS.find((o) => o.qty === selectedQty)?.price}</strong>
-      </div>
 
       <label className="n-field n-field-wide">
         <span>العنوان بالتفصيل (المنطقة، أقرب نقطة دالة)</span>

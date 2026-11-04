@@ -922,3 +922,19 @@
 }
 .n-gallery-prev { left: 8px; }
 .n-gallery-next { right: 8px; }
+
+.n-product-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 1056px;
+  margin: 16px auto 0;
+  padding-inline: 16px;
+  color: var(--n-text-dim);
+  font-size: 14px;
+}
+.n-product-layout { margin-top: 12px; }
+.n-product-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+.n-product-links a { font-size: 14px; }
+.n-product-layout #order, #reviews { scroll-margin-top: 16px; }

@@ -73,7 +73,13 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
         </a>
       </div>
 
-      <div className="n-intro">
+      <nav className="n-product-nav" aria-label="مسار الصفحة">
+        <a href="/">الرئيسية</a><span aria-hidden="true">‹</span>
+        <a href="/products">المنتجات</a><span aria-hidden="true">‹</span>
+        <span aria-current="page">بكج نضارة الكامل</span>
+      </nav>
+
+      <div className="n-intro n-product-layout">
         <section className="n-intro-product" aria-labelledby="product-title">
           <ProductGallery />
           <div>
@@ -81,6 +87,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
             <p>غسول، مقشر وكريم في بكج واحد.</p>
             <div className="n-offer"><strong>٣٣٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
+            <div className="n-product-links"><a className="n-home-order" href="#order">اطلبي الآن</a><a href="#reviews">تجارب الزبونات</a></div>
           </div>
         </section>
         <section className="n-order" id="order" aria-labelledby="order-title">
@@ -115,7 +122,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <section className="n-section">
         <div className="n-section-title">
-          <h2>شنو يحتوي البكج؟</h2>
+          <h2>تفاصيل البكج</h2>
           <p>ثلاث خطوات بسيطة لروتين عناية يومي</p>
         </div>
         <div className="n-package-grid">
@@ -223,7 +230,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <section className="n-section">
         <div className="n-section-title">
-          <h2>تجارب زبوناتنا 💬</h2>
+          <h2 id="reviews">آراء وتجارب الزبونات</h2>
           <p>آراء حقيقية من زبونات استخدمن بكج نضارة</p>
         </div>
         <div className="n-testimonials n-testimonials-img">
