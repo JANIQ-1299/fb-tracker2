@@ -7,6 +7,7 @@ export interface NadharaOrderInput {
   address: string;
   quantity: number;
   notes?: string;
+  adId?: string;
   // كوكيز بكسل Meta - لتحسين مطابقة حدث Purchase لاحقًا (راجع lib/pixel.ts)
   fbp?: string;
   fbc?: string;

@@ -93,6 +93,7 @@ export interface NadharaOrder {
   quantity: number;
   price: number;
   notes?: string;
+  adId?: string;
   receivedAt: Date;
   fbp?: string;
   fbc?: string;
@@ -175,6 +176,7 @@ export async function sendOrderToTelegram(order: NadharaOrder) {
     `العنوان: ${order.address}`,
     `الكمية: ${order.quantity}`,
     `السعر: ${order.price.toLocaleString("en-US")} د.ع`,
+    order.adId ? "Meta Ad ID: " + order.adId : null,
     order.notes ? `ملاحظات: ${order.notes}` : null,
     `الوقت: ${order.receivedAt.toLocaleString("ar-IQ", { timeZone: env.tz })}`,
   ]

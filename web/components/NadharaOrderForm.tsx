@@ -51,7 +51,9 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
     try {
       const { fbp, fbc } = getFacebookCookies();
       const { scid, scclid } = getSnapCookies();
+      const adId = new URLSearchParams(window.location.search).get("ad_id") ?? "";
       const result = await submitNadharaOrder({
+        adId: /^\d{1,25}$/.test(adId) ? adId : undefined,
         name: String(data.get("name") ?? ""),
         phone: String(data.get("phone") ?? ""),
         city: String(data.get("city") ?? ""),

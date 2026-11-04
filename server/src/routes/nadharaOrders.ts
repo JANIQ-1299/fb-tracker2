@@ -16,6 +16,9 @@ const orderSchema = z.object({
   address: z.string().trim().min(5, "الرجاء كتابة العنوان بالتفصيل").max(500),
   quantity: z.coerce.number().int().min(1).max(20).default(1),
   notes: z.string().trim().max(500).optional(),
+  adId: z.unknown().transform((value) =>
+    typeof value === "string" && /^\d{1,25}$/.test(value) ? value : undefined,
+  ),
   // fbp/fbc: كوكيز بكسل Meta (من متصفح الزائر) - تُستخدم لاحقًا لتحسين جودة مطابقة حدث
   // Purchase عند تأكيد الطلب (راجع services/metaPixelEvents.ts)
   fbp: z.string().trim().max(200).optional(),
