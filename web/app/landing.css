@@ -820,3 +820,30 @@
   .n-intro-product > div { padding: 12px; }
   .n-intro .n-field :is(input, select, textarea) { font-size: 16px; min-height: 44px; }
 }
+
+/* Boutique palette and typography for the public landing page. */
+.n-intro-product {
+  background: #faf3ee;
+  border: 1px solid #e9d8cd;
+  border-radius: 18px;
+  color: #42242b;
+}
+.n-intro-product h1 { font-weight: 750; letter-spacing: normal; }
+.n-intro-product .n-hero-badge {
+  background: transparent;
+  color: #78354b;
+  padding: 0;
+  border: 0;
+  font-size: 13px;
+}
+.n-intro-product strong { display: inline-block; padding-block: 4px; color: #78354b; }
+.n-intro .n-order-card {
+  background: #fffdf9;
+  border: 1px solid #e9d8cd;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px #492a3410;
+}
+.n-intro .n-order-card h2 { color: #542838; }
+.n-intro .n-order-card :is(input, select, textarea) { border-color: #dcc9c3; }
+.n-intro .n-order-card button[type="submit"] { background: #743047; color: #fff; }
+.n-intro .n-order-card button[type="submit"]:focus-visible { outline: 3px solid #a65a72; outline-offset: 3px; }
