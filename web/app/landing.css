@@ -6,16 +6,16 @@
      دومًا، بدل اتّباع الوضع الداكن للجهاز - يمنع أي تباين لوني غير مقصود مع ألوان الصفحة الثابتة. */
   color-scheme: light;
 
-  --n-bg: #fff6f8;
-  --n-surface: #ffffff;
-  --n-pink: #e2678a;
-  --n-pink-dark: #c14b6e;
-  --n-pink-light: #fbe4ea;
-  --n-pink-lighter: #fdf0f3;
-  --n-gold: #c79a5b;
-  --n-text: #4a2f3a;
-  --n-text-dim: #8a6b76;
-  --n-border: #f3d7de;
+  --n-bg: #f8f2e9;
+  --n-surface: #fffdf9;
+  --n-pink: #9a4862;
+  --n-pink-dark: #712b45;
+  --n-pink-light: #f1dfe3;
+  --n-pink-lighter: #fbf2f2;
+  --n-gold: #9a733e;
+  --n-text: #37232b;
+  --n-text-dim: #6c505a;
+  --n-border: #e6d1cf;
   --n-radius: 18px;
 
   direction: rtl;
@@ -566,7 +566,7 @@
   font-size: 15px;
   font-weight: 700;
   color: #7a5a1f;
-  background: linear-gradient(135deg, #fdf0d8 0%, #fbe4ea 100%);
+  background: linear-gradient(135deg, #fdf0d8 0%, #f1dfe3 100%);
   border: 1.5px solid #f0d9ae;
   border-radius: 16px;
   padding: 14px 20px;
@@ -845,5 +845,41 @@
 }
 .n-intro .n-order-card h2 { color: #542838; }
 .n-intro .n-order-card :is(input, select, textarea) { border-color: #dcc9c3; }
-.n-intro .n-order-card button[type="submit"] { background: #743047; color: #fff; }
+.n-intro .n-order-card button[type="submit"] { background: #712b45; color: #fff; }
 .n-intro .n-order-card button[type="submit"]:focus-visible { outline: 3px solid #a65a72; outline-offset: 3px; }
+
+.n-intro-product { background: #fffaf5; }
+.n-intro-product > div { padding: clamp(16px, 4vw, 28px); }
+.n-intro-photo { background: #f6e6e4; }
+.n-offer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 12px; }
+.n-offer strong { font-size: 23px; }
+.n-offer span { font-size: 13px; color: #634a50; }
+@media (max-width: 640px) {
+  .n-intro-product { display: block; }
+  .n-intro-photo { aspect-ratio: 2 / 1; object-fit: cover; object-position: center 65%; }
+  .n-intro-product h1 { font-size: 22px; }
+}
+
+.n-home-intro { align-items: center; }
+.n-home-intro > img { border-radius: var(--n-radius); }
+.n-home-copy { padding: 12px 4px; }
+.n-home-copy h1 { font-size: clamp(29px, 5vw, 56px); line-height: 1.2; margin: 12px 0; }
+.n-home-copy p { color: var(--n-text-dim); }
+.nadhara-page .n-home-order {
+  display: inline-block;
+  padding: 13px 24px;
+  background: var(--n-pink-dark);
+  color: white;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.n-intro-product .n-intro-photo {
+  aspect-ratio: 1;
+  object-fit: contain;
+  object-position: center;
+}
+@media (max-width: 640px) {
+  .n-intro-product .n-intro-photo { max-height: 350px; }
+}

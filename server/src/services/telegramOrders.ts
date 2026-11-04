@@ -79,7 +79,8 @@ function writeOrdersStore(store: Record<string, PendingOrder>) {
 // الباقة الوحيدة المعروضة بالفورم: بكج واحد (33,000) أو ٣ بكجات بسعر بكجين (65,000)
 export function priceForQuantity(quantity: number): number {
   if (quantity === 1) return 33_000;
-  if (quantity === 3) return 65_000;
+  if (quantity === 2) return 60_000;
+  if (quantity === 3) return 81_000;
   return quantity * 33_000;
 }
 
