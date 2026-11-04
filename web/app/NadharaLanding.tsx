@@ -80,7 +80,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
       </nav>
 
       <div className="n-intro n-product-layout">
-        <section className="n-intro-product" aria-labelledby="product-title">
+        <section className="n-intro-product" id="order" aria-labelledby="product-title">
           <ProductGallery />
           <div>
             <span className="n-hero-badge">نضارة للعناية</span>
@@ -90,7 +90,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
             <div className="n-product-links"><a href="#reviews">تجارب الزبونات</a></div>
           </div>
         </section>
-        <section className="n-order" id="order" aria-labelledby="order-title">
+        <section className="n-order" aria-labelledby="order-title">
           <div className="n-order-card">
             <div className="n-section-title">
               <h2 id="order-title">اطلبي بكج نضارة</h2>
