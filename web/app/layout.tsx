@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "نظام تتبع الطلبات - Meta",
+  title: "نضارة",
   description: "لوحة تحكم تتبع العملاء المحتملين والطلبات من إعلانات Meta",
 };
 
