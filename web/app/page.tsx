@@ -14,7 +14,7 @@ export default function Home() {
           <h1 id="home-title">روتين عناية يبدأ مع نضارة</h1>
           <p>غسول ومقشر وكريم للعناية بالمناطق الحساسة، في بكج واحد.</p>
           <a className="n-home-order" href="/order#order">اختاري باقتك واطلبي</a>
-          <p>الأسعار تبدأ من ٣٣٬٠٠٠ د.ع شامل التوصيل.</p>
+          <p>الأسعار تبدأ من ٣٣٬٠٠٠ د.ع مع توصيل مجاني.</p>
         </div>
       </section>
       <footer className="n-footer">

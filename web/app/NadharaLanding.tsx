@@ -79,7 +79,7 @@ export default function LandingPage() {
             <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
             <p>غسول، مقشر وكريم في بكج واحد.</p>
-            <div className="n-offer"><strong>٣٣٬٠٠٠ د.ع</strong><span>شامل التوصيل</span></div>
+            <div className="n-offer"><strong>٣٣٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
           </div>
         </section>
         <section className="n-order" id="order" aria-labelledby="order-title">
