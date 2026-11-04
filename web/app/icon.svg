@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Nadhara</title>
+  <rect width="64" height="64" rx="15" fill="#faeceb"/>
+  <g fill="#a82b52">
+    <path d="M32 31C22 26 23 15 32 7c9 8 10 19 0 24Z"/>
+    <path d="M29 34C22 40 12 36 8 26c10-5 19-2 21 8Z"/>
+    <path d="M35 34c7 6 17 2 21-8-10-5-19-2-21 8Z"/>
+    <path d="M30 38c2 9-3 16-13 19-2-10 3-17 13-19Z"/>
+    <path d="M34 38c-2 9 3 16 13 19 2-10-3-17-13-19Z"/>
+  </g>
+</svg>
