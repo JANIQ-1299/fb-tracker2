@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 const GALLERY_IMAGES = [
-  ["/images/nadhara-product-new.png", "بكج نضارة مع كرت الضمان"],
   ["/images/nadhara-product-card.jpg", "منتجات نضارة وكرت ضمان المنتج"],
   ["/images/nadhara-khtwat.jpg", "بكج نضارة الكامل"],
   ["/images/nadhara-lifestyle.jpg", "تفاصيل عبوات بكج نضارة"],
