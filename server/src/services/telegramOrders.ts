@@ -81,9 +81,11 @@ function writeOrdersStore(store: Record<string, PendingOrder>) {
 // أسعار الباقات المعروضة في صفحة الهبوط.
 export function priceForQuantity(quantity: number): number {
   if (quantity === 1) return 35_000;
-  if (quantity === 2) return 60_000;
-  if (quantity === 3) return 81_000;
-  return quantity * 35_000;
+  return quantity * 30_000;
+}
+
+export function freeQuantityForQuantity(quantity: number): number {
+  return Math.floor(quantity / 2);
 }
 
 export interface NadharaOrder {
@@ -94,6 +96,7 @@ export interface NadharaOrder {
   address: string;
   quantity: number;
   price: number;
+  freeQuantity?: number;
   couponCode?: string;
   couponApplied?: boolean;
   notes?: string;
@@ -178,7 +181,8 @@ export async function sendOrderToTelegram(order: NadharaOrder) {
     `الهاتف: ${order.phone}`,
     `المحافظة/المدينة: ${order.city}`,
     `العنوان: ${order.address}`,
-    `الكمية: ${order.quantity}`,
+    `الكمية المدفوعة: ${order.quantity}`,
+    order.freeQuantity ? `الهدية: ${order.freeQuantity} بكج مجاني (الإجمالي: ${order.quantity + order.freeQuantity})` : null,
     `السعر: ${order.price.toLocaleString("en-US")} د.ع`,
     order.couponApplied ? `كود الخصم: ${order.couponCode} (خصم 10%)` : null,
     order.adId ? "Meta Ad ID: " + order.adId : null,

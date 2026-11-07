@@ -1,6 +1,6 @@
 "use client";
 
-import { PACKAGE_OPTIONS } from "../lib/nadharaPackages";
+import { freePackages, packagePrice } from "../lib/nadharaPackages";
 import { useEffect, useState, type FormEvent } from "react";
 import { submitNadharaOrder } from "../lib/publicApi";
 import { trackPurchase, getFacebookCookies, getSnapCookies } from "../lib/pixel";
@@ -35,7 +35,7 @@ type Status = "idle" | "submitting" | "success" | "error";
 export default function NadharaOrderForm({ initialQuantity }: { initialQuantity: number }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [selectedQty, setSelectedQty] = useState(PACKAGE_OPTIONS.find(({ qty }) => qty === initialQuantity)?.qty ?? 1);
+  const [selectedQty, setSelectedQty] = useState(Math.min(20, Math.max(1, initialQuantity || 1)));
   const [couponCode, setCouponCode] = useState(COUPON_CODE);
 
   useEffect(() => {
@@ -47,11 +47,11 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
     return () => window.clearTimeout(expiry);
   }, []);
 
-  const selectedPrice = PACKAGE_OPTIONS.find((o) => o.qty === selectedQty)?.price ?? "";
-  const basePrice = Number(selectedPrice.replace(/[^0-9]/g, "")) || 0;
+  const basePrice = packagePrice(selectedQty);
+  const freeQty = freePackages(selectedQty);
   const hasDiscount = couponCode.trim().toUpperCase() === COUPON_CODE;
   const displayedPrice = Math.round(basePrice * (hasDiscount ? 0.9 : 1));
-  const displayedPriceLabel = displayedPrice ? `${displayedPrice.toLocaleString("en-US")} د.ع` : selectedPrice;
+  const displayedPriceLabel = `${displayedPrice.toLocaleString("en-US")} د.ع`;
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -117,21 +117,16 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         className="n-hp"
       />
 
-      <label className="n-field n-field-wide">
-        <span>اختاري الكمية</span>
-        <select
-          name="quantity"
-          required
-          value={selectedQty}
-          onChange={(e) => setSelectedQty(Number(e.target.value))}
-        >
-          {PACKAGE_OPTIONS.map((opt) => (
-            <option key={opt.qty} value={opt.qty}>
-              {opt.label} — {opt.price}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div className="n-field n-field-wide n-quantity-stepper">
+        <span>عدد البكجات المدفوعة</span>
+        <div className="n-stepper-controls" dir="ltr">
+          <button type="button" aria-label="زيادة البكجات" onClick={() => setSelectedQty((q) => Math.min(20, q + 1))}>+</button>
+          <strong>{selectedQty}</strong>
+          <button type="button" aria-label="تقليل البكجات" disabled={selectedQty <= 1} onClick={() => setSelectedQty((q) => Math.max(1, q - 1))}>−</button>
+        </div>
+        <small className="n-bundle-gift">{freeQty ? `🎁 تحصلين على ${freeQty} بكج مجاني — الإجمالي للتوصيل: ${selectedQty + freeQty}` : "اطلبي بكجين لتحصلي على الثالث مجانًا"}</small>
+        <input type="hidden" name="quantity" value={selectedQty} />
+      </div>
 
       <div className="n-price-line n-field-wide" aria-live="polite">
         <span>السعر الإجمالي</span>

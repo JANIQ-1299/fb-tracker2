@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { logger } from "../lib/logger.js";
-import { appendOrderToCsv, priceForQuantity, sendOrderToTelegram } from "../services/telegramOrders.js";
+import { appendOrderToCsv, freeQuantityForQuantity, priceForQuantity, sendOrderToTelegram } from "../services/telegramOrders.js";
 
 // نقطة نهاية عامة بلا مصادقة لاستقبال طلبات نموذج صفحة هبوط نضارة (web/app/page.tsx).
 // مستقلة تمامًا عن مخطط Lead/Order متعدد المستأجرين - راجع services/telegramOrders.ts.
@@ -50,6 +50,7 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     ...order,
     orderId: crypto.randomUUID(),
     price: couponApplied ? Math.round(basePrice * 0.9) : basePrice,
+    freeQuantity: freeQuantityForQuantity(order.quantity),
     couponApplied,
     receivedAt: new Date(),
     fbp,
