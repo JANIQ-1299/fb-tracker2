@@ -934,9 +934,9 @@
   display: flex;
   overflow: hidden;
 }
-.n-gallery-image { flex: 0 0 100%; display: none; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.n-gallery-image { flex: 0 0 100%; display: none; width: 100%; min-height: 230px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .n-gallery-image.is-active { display: block; }
-.n-gallery-image .n-intro-photo { opacity: 1; transition: opacity .35s ease; }
+.n-gallery-image .n-intro-photo { display: block; width: 100%; min-height: 230px; opacity: 1; transition: opacity .35s ease; }
 .n-hero-gallery button {
   position: absolute;
   top: 50%;
