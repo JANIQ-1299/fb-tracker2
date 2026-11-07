@@ -55,6 +55,13 @@ export default function ProductGallery() {
         ))}
       </div>
       <div className="n-gallery-caption" aria-live="polite">{GALLERY_IMAGES[active][1]}</div>
+      <div className="n-gallery-thumbs" aria-label="كل صور المنتج والتجارب">
+        {GALLERY_IMAGES.map(([src, alt], index) => (
+          <button key={`thumb-${src}`} type="button" className={index === active ? "is-active" : ""} onClick={() => setActive(index)} aria-label={`اختيار ${alt}`}>
+            <img src={src} alt="" loading="eager" />
+          </button>
+        ))}
+      </div>
     </figure>
   );
 }

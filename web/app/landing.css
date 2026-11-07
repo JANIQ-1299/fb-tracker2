@@ -926,6 +926,10 @@
 .n-hero-gallery { position: relative; margin: 0; }
 .n-gallery-title { margin-bottom: 8px; color: var(--n-pink-dark); font-size: 15px; font-weight: 800; text-align: center; }
 .n-gallery-caption { margin-top: 9px; color: var(--n-text-dim); font-size: 12px; text-align: center; }
+.n-gallery-thumbs { display: flex; gap: 7px; overflow-x: auto; padding: 10px 2px 2px; scrollbar-width: thin; }
+.n-gallery-thumbs button { flex: 0 0 54px; width: 54px; height: 54px; padding: 2px; border: 1px solid var(--n-border); border-radius: 9px; background: var(--n-surface); cursor: pointer; opacity: .72; }
+.n-gallery-thumbs button.is-active { border: 2px solid var(--n-pink-dark); opacity: 1; }
+.n-gallery-thumbs img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; }
 .n-hero-gallery-track {
   display: flex;
   overflow: hidden;
