@@ -68,6 +68,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <div className="n-topbar">
         <span className="n-logo">نضارة</span>
+        <a className="n-topbar-link" href="#order-form">اطلبي الآن</a>
       </div>
 
       <nav className="n-product-nav" aria-label="مسار الصفحة">
@@ -82,13 +83,20 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
           <div>
             <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
-            <p>غسول، مقشر وكريم في بكج واحد.</p>
+            <p className="n-hero-summary">غسول، مقشر وكريم موحّد للون في روتين واحد بسيط للعناية اليومية.</p>
+            <div className="n-pieces" aria-label="محتويات البكج">
+              <span>غسول</span><b>+</b><span>مقشر</span><b>+</b><span>كريم موحّد للون</span>
+            </div>
             <div className="n-offer"><strong>٣٥٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
             <PromoTimer />
-            <div className="n-product-links"><a href="#reviews">تجارب الزبونات</a></div>
+            <div className="n-hero-benefit">🚚 توصيل مجاني لجميع محافظات العراق</div>
+            <div className="n-product-links">
+              <a className="n-hero-cta" href="#order-form">اطلبي البكج</a>
+              <a href="#reviews">تجارب الزبونات</a>
+            </div>
           </div>
         </section>
-        <section className="n-order" aria-labelledby="order-title">
+        <section className="n-order" id="order-form" aria-labelledby="order-title">
           <div className="n-order-card">
             <div className="n-section-title">
               <h2 id="order-title">اطلبي بكج نضارة</h2>
