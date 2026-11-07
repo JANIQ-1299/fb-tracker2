@@ -76,8 +76,8 @@
 .n-promo-timer {
   display: grid;
   gap: 5px;
-  margin-top: 14px;
-  padding: 12px 14px;
+  margin-top: 8px;
+  padding: 8px 10px;
   border: 1px solid var(--n-border);
   border-radius: 14px;
   background: linear-gradient(135deg, #fff8f1, var(--n-pink-lighter));
@@ -87,7 +87,7 @@
 }
 
 .n-promo-clock {
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: 1px;
 }
@@ -882,6 +882,9 @@
   .n-intro-product { display: block; }
   .n-intro-photo { aspect-ratio: 2 / 1; object-fit: cover; object-position: center 65%; }
   .n-intro-product h1 { font-size: 22px; }
+  .n-intro-product > div { padding: 14px; }
+  .n-offer { margin-top: 6px; }
+  .n-product-links { margin-top: 8px; }
 }
 
 .n-home-intro { align-items: center; }

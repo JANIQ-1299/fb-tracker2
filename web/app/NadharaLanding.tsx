@@ -81,15 +81,11 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
         <section className="n-intro-product" id="order" aria-labelledby="product-title">
           <ProductGallery />
           <div>
-            <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
-            <p className="n-hero-summary">غسول، مقشر وكريم موحّد للون.</p>
             <div className="n-offer"><strong>٣٥٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
             <PromoTimer />
-            <div className="n-hero-benefit">🚚 توصيل مجاني لجميع محافظات العراق</div>
             <div className="n-product-links">
               <a className="n-hero-cta" href="#order-form">اطلبي البكج</a>
-              <a href="#order-form">اطلبي الآن</a>
             </div>
           </div>
         </section>
