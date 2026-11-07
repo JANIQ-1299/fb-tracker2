@@ -937,7 +937,8 @@
 .n-gallery-image { flex: 0 0 100%; display: none; width: 100%; min-height: 230px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .n-gallery-image.is-active { display: block; }
 .n-gallery-image .n-intro-photo { display: block; width: 100%; height: clamp(280px, 38vw, 430px); min-height: 280px; aspect-ratio: auto; object-fit: cover; opacity: 1; transition: opacity .35s ease; }
-.n-hero-gallery button {
+.n-hero-gallery > .n-gallery-prev,
+.n-hero-gallery > .n-gallery-next {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
