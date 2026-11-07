@@ -50,6 +50,8 @@ interface PendingOrder {
   city: string;
   quantity: number;
   price: number;
+  couponCode?: string;
+  couponApplied?: boolean;
   receivedAt: string;
   fbp?: string;
   fbc?: string;
@@ -76,12 +78,12 @@ function writeOrdersStore(store: Record<string, PendingOrder>) {
   fs.writeFileSync(ORDERS_STORE_PATH, JSON.stringify(store, null, 2));
 }
 
-// الباقة الوحيدة المعروضة بالفورم: بكج واحد (33,000) أو ٣ بكجات بسعر بكجين (65,000)
+// أسعار الباقات المعروضة في صفحة الهبوط.
 export function priceForQuantity(quantity: number): number {
-  if (quantity === 1) return 33_000;
+  if (quantity === 1) return 35_000;
   if (quantity === 2) return 60_000;
   if (quantity === 3) return 81_000;
-  return quantity * 33_000;
+  return quantity * 35_000;
 }
 
 export interface NadharaOrder {
@@ -92,6 +94,8 @@ export interface NadharaOrder {
   address: string;
   quantity: number;
   price: number;
+  couponCode?: string;
+  couponApplied?: boolean;
   notes?: string;
   adId?: string;
   receivedAt: Date;
@@ -176,6 +180,7 @@ export async function sendOrderToTelegram(order: NadharaOrder) {
     `العنوان: ${order.address}`,
     `الكمية: ${order.quantity}`,
     `السعر: ${order.price.toLocaleString("en-US")} د.ع`,
+    order.couponApplied ? `كود الخصم: ${order.couponCode} (خصم 10%)` : null,
     order.adId ? "Meta Ad ID: " + order.adId : null,
     order.notes ? `ملاحظات: ${order.notes}` : null,
     `الوقت: ${order.receivedAt.toLocaleString("ar-IQ", { timeZone: env.tz })}`,

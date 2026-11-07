@@ -6,6 +6,7 @@ export interface NadharaOrderInput {
   city: string;
   address: string;
   quantity: number;
+  couponCode?: string;
   notes?: string;
   adId?: string;
   // كوكيز بكسل Meta - لتحسين مطابقة حدث Purchase لاحقًا (راجع lib/pixel.ts)

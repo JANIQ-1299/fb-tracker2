@@ -15,6 +15,7 @@ const orderSchema = z.object({
   city: z.string().trim().min(2, "الرجاء تحديد المحافظة/المدينة").max(100),
   address: z.string().trim().min(5, "الرجاء كتابة العنوان بالتفصيل").max(500),
   quantity: z.coerce.number().int().min(1).max(20).default(1),
+  couponCode: z.string().trim().max(40).optional(),
   notes: z.string().trim().max(500).optional(),
   adId: z.unknown().transform((value) =>
     typeof value === "string" && /^\d{1,25}$/.test(value) ? value : undefined,
@@ -43,10 +44,13 @@ nadharaOrdersRouter.post("/", async (req, res) => {
     return res.json({ ok: true });
   }
 
+  const couponApplied = order.couponCode?.toUpperCase() === "NADHARA10";
+  const basePrice = priceForQuantity(order.quantity);
   const record = {
     ...order,
     orderId: crypto.randomUUID(),
-    price: priceForQuantity(order.quantity),
+    price: couponApplied ? Math.round(basePrice * 0.9) : basePrice,
+    couponApplied,
     receivedAt: new Date(),
     fbp,
     fbc,

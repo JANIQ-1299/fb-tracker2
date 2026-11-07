@@ -9,7 +9,7 @@ export default function ProductCollection({ titleLevel: Title }: { titleLevel: "
         <div>
           <h3>بكج نضارة الكامل</h3>
           <p>غسول ومقشر وكريم. توصيل مجاني.</p>
-          <p><strong>يبدأ من ٣٣٬٠٠٠ د.ع</strong></p>
+          <p><strong>يبدأ من ٣٥٬٠٠٠ د.ع</strong></p>
           <a className="n-home-order" href="/order">اطلبي البكج</a>
         </div>
       </article>

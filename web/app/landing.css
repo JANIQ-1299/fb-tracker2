@@ -73,6 +73,40 @@
   background: var(--n-border);
 }
 
+.n-promo-timer {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--n-border);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff8f1, var(--n-pink-lighter));
+  color: var(--n-pink-dark);
+  text-align: center;
+  font-size: 12px;
+}
+
+.n-promo-clock {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.n-promo-timer b {
+  color: var(--n-gold);
+  letter-spacing: .4px;
+}
+
+.n-coupon-ok,
+.n-coupon-hint {
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+}
+
+.n-coupon-ok { color: #237a55; }
+.n-coupon-hint { color: var(--n-text-dim); }
+
 /* ---- Hero ---- */
 .n-hero {
   position: relative;

@@ -2,6 +2,7 @@ import ProductGallery from "../components/ProductGallery";
 import Script from "next/script";
 import "./landing.css";
 import NadharaOrderForm from "../components/NadharaOrderForm";
+import PromoTimer from "../components/PromoTimer";
 import { META_PIXEL_ID, SNAP_PIXEL_ID } from "../lib/pixel";
 
 // يمنع كاش طويل الأمد (سنة كاملة افتراضيًا لصفحات Next الثابتة) عند بروكسيات شركات
@@ -67,9 +68,6 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <div className="n-topbar">
         <span className="n-logo">نضارة</span>
-        <a className="n-topbar-link" href={CONTACT.instagram} target="_blank" rel="noopener noreferrer">
-          تابعينا على إنستقرام
-        </a>
       </div>
 
       <nav className="n-product-nav" aria-label="مسار الصفحة">
@@ -85,7 +83,8 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
             <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
             <p>غسول، مقشر وكريم في بكج واحد.</p>
-            <div className="n-offer"><strong>٣٣٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
+            <div className="n-offer"><strong>٣٥٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
+            <PromoTimer />
             <div className="n-product-links"><a href="#reviews">تجارب الزبونات</a></div>
           </div>
         </section>
