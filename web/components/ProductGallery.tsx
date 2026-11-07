@@ -26,7 +26,8 @@ export default function ProductGallery() {
   }, []);
 
   return (
-    <figure className="n-hero-gallery" aria-label="صور بكج نضارة">
+    <figure className="n-hero-gallery" aria-label="صور المنتج وتجارب الزبائن">
+      <figcaption className="n-gallery-title">صور المنتج وتجارب الزبائن</figcaption>
       <div className="n-hero-gallery-track" dir="ltr" tabIndex={0} aria-label="اسحبي يمينًا أو يسارًا لتصفح صور المنتج والتجارب">
         {GALLERY_IMAGES.map(([src, alt], index) => (
           <button
@@ -53,6 +54,7 @@ export default function ProductGallery() {
           <button key={alt + index} type="button" className={index === active ? "is-active" : ""} aria-label={`عرض ${alt}`} onClick={() => setActive(index)} />
         ))}
       </div>
+      <div className="n-gallery-caption" aria-live="polite">{GALLERY_IMAGES[active][1]}</div>
     </figure>
   );
 }

@@ -924,6 +924,8 @@
 .n-catalog-single { max-width: 420px; margin-inline: auto; }
 
 .n-hero-gallery { position: relative; margin: 0; }
+.n-gallery-title { margin-bottom: 8px; color: var(--n-pink-dark); font-size: 15px; font-weight: 800; text-align: center; }
+.n-gallery-caption { margin-top: 9px; color: var(--n-text-dim); font-size: 12px; text-align: center; }
 .n-hero-gallery-track {
   display: flex;
   overflow: hidden;
