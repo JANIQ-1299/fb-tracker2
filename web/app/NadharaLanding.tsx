@@ -83,10 +83,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
           <div>
             <span className="n-hero-badge">نضارة للعناية</span>
             <h1 id="product-title">بكج نضارة للعناية بالمناطق الحساسة</h1>
-            <p className="n-hero-summary">غسول، مقشر وكريم موحّد للون في روتين واحد بسيط للعناية اليومية.</p>
-            <div className="n-pieces" aria-label="محتويات البكج">
-              <span>غسول</span><b>+</b><span>مقشر</span><b>+</b><span>كريم موحّد للون</span>
-            </div>
+            <p className="n-hero-summary">غسول، مقشر وكريم موحّد للون.</p>
             <div className="n-offer"><strong>٣٥٬٠٠٠ د.ع</strong><span>توصيل مجاني</span></div>
             <PromoTimer />
             <div className="n-hero-benefit">🚚 توصيل مجاني لجميع محافظات العراق</div>
