@@ -205,7 +205,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
 
       <section className="n-section">
         <div className="n-guarantee">
-          <img className="n-guarantee-img" src="/images/nadhara-guarantee-new.png" alt="منتجات نضارة وكرت الضمان" />
+          <img className="n-guarantee-img" src="/images/nadhara-guarantee-card.jpg" alt="كرت ضمان منتجات نضارة" />
           <div className="n-guarantee-icon">🛡️</div>
           <h3>كرت الضمان</h3>
           <p>يصل كرت الضمان مع كل بكج - يرجى الاحتفاظ فيه لضمان حقچ كزبونة.</p>
