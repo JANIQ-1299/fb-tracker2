@@ -6,16 +6,16 @@
      دومًا، بدل اتّباع الوضع الداكن للجهاز - يمنع أي تباين لوني غير مقصود مع ألوان الصفحة الثابتة. */
   color-scheme: light;
 
-  --n-bg: #fff9f3;
+  --n-bg: #fff7f2;
   --n-surface: #fffdf9;
-  --n-pink: #a64d6d;
-  --n-pink-dark: #762b49;
-  --n-pink-light: #f3dde3;
-  --n-pink-lighter: #fff4f5;
-  --n-gold: #b58a55;
-  --n-text: #3c2730;
-  --n-text-dim: #745761;
-  --n-border: #ead5d5;
+  --n-pink: #c23b68;
+  --n-pink-dark: #5b1637;
+  --n-pink-light: #f6cbd8;
+  --n-pink-lighter: #fff0f4;
+  --n-gold: #a66a22;
+  --n-text: #28151d;
+  --n-text-dim: #5d414b;
+  --n-border: #d8b3bd;
   --n-radius: 18px;
 
   direction: rtl;
@@ -855,7 +855,7 @@
   border-radius: 18px;
   box-shadow: 0 12px 30px #492a3410;
 }
-.n-intro .n-order-card h2 { color: #542838; }
+.n-intro .n-order-card h2 { color: var(--n-pink-dark); }
 .n-intro .n-order-card :is(input, select, textarea) { border-color: #dcc9c3; }
 .n-intro .n-order-card button[type="submit"] { background: var(--n-pink-dark); color: #fff; }
 .n-intro .n-order-card button[type="submit"]:focus-visible { outline: 3px solid #a65a72; outline-offset: 3px; }
