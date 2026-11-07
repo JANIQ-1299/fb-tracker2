@@ -6,7 +6,6 @@ const GALLERY_IMAGES = [
   ["/images/nadhara-product-card.jpg", "منتجات نضارة وكرت ضمان المنتج"],
   ["/images/nadhara-khtwat.jpg", "بكج نضارة الكامل"],
   ["/images/nadhara-lifestyle.jpg", "تفاصيل عبوات بكج نضارة"],
-  ["/images/nadhara-routine.jpg", "روتين العناية من نضارة"],
   ["/images/testimonials/t1.jpg", "تجربة زبونة مع بكج نضارة"],
   ["/images/testimonials/t2.jpg", "تجربة زبونة مع بكج نضارة"],
   ["/images/testimonials/t3.jpg", "تجربة زبونة مع بكج نضارة"],
