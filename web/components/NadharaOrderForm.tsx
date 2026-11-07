@@ -1,9 +1,10 @@
 "use client";
 
 import { PACKAGE_OPTIONS } from "../lib/nadharaPackages";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { submitNadharaOrder } from "../lib/publicApi";
 import { trackPurchase, getFacebookCookies, getSnapCookies } from "../lib/pixel";
+import { DURATION_SECONDS, STORAGE_KEY } from "./PromoTimer";
 
 const GOVERNORATES = [
   "بغداد",
@@ -35,7 +36,16 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [selectedQty, setSelectedQty] = useState(PACKAGE_OPTIONS.find(({ qty }) => qty === initialQuantity)?.qty ?? 1);
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(COUPON_CODE);
+
+  useEffect(() => {
+    const now = Date.now();
+    const stored = Number(window.localStorage.getItem(STORAGE_KEY));
+    const start = stored > 0 && now - stored < DURATION_SECONDS * 1000 ? stored : now;
+    window.localStorage.setItem(STORAGE_KEY, String(start));
+    const expiry = window.setTimeout(() => setCouponCode(""), Math.max(0, DURATION_SECONDS * 1000 - (now - start)));
+    return () => window.clearTimeout(expiry);
+  }, []);
 
   const selectedPrice = PACKAGE_OPTIONS.find((o) => o.qty === selectedQty)?.price ?? "";
   const basePrice = Number(selectedPrice.replace(/[^0-9]/g, "")) || 0;
@@ -128,24 +138,7 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         <strong>{displayedPriceLabel}</strong>
       </div>
 
-      <label className="n-field n-field-wide">
-        <span>كود الخصم (اختياري)</span>
-        <input
-          type="text"
-          name="couponCode"
-          value={couponCode}
-          onChange={(e) => setCouponCode(e.target.value)}
-          placeholder="NADHARA10"
-          maxLength={40}
-          dir="ltr"
-          autoCapitalize="characters"
-        />
-        {couponCode.trim() && (
-          <small className={hasDiscount ? "n-coupon-ok" : "n-coupon-hint"}>
-            {hasDiscount ? "تم تطبيق خصم 10٪" : "استخدمي الكود NADHARA10 للحصول على خصم 10٪"}
-          </small>
-        )}
-      </label>
+      {hasDiscount && <p className="n-coupon-ok n-field-wide">تم تطبيق خصم 10٪ تلقائيًا على طلبك</p>}
 
       <label className="n-field">
         <span>الاسم الكامل</span>

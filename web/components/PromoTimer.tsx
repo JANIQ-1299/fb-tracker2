@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-const DURATION_SECONDS = 24 * 60 * 60;
-const STORAGE_KEY = "nadhara-promo-start";
+export const DURATION_SECONDS = 10 * 60;
+export const STORAGE_KEY = "nadhara-promo-start";
 
 function formatPart(value: number) {
   return String(value).padStart(2, "0");
@@ -37,7 +37,7 @@ export default function PromoTimer() {
       <span className="n-promo-clock" dir="ltr">
         {formatPart(hours)}:{formatPart(minutes)}:{formatPart(seconds)}
       </span>
-      <span>استخدمي الكود <b dir="ltr">NADHARA10</b> عند الطلب</span>
+      <span>خصم ١٠٪ يطبق تلقائيًا على الطلب</span>
     </div>
   );
 }
