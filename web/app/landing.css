@@ -971,6 +971,7 @@
   color: var(--n-text-dim);
   font-size: 14px;
 }
+.n-home-intro .n-home-hero-image { width: 100%; height: auto; max-height: none; aspect-ratio: auto; object-fit: contain; }
 .n-product-layout { margin-top: 12px; }
 .n-product-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
 .n-product-links a { font-size: 14px; }
