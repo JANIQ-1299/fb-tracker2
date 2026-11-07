@@ -29,14 +29,21 @@ export default function ProductGallery() {
     <figure className="n-hero-gallery" aria-label="صور بكج نضارة">
       <div className="n-hero-gallery-track" dir="ltr" tabIndex={0} aria-label="اسحبي يمينًا أو يسارًا لتصفح صور المنتج والتجارب">
         {GALLERY_IMAGES.map(([src, alt], index) => (
-          <img
+          <button
             key={src}
-            className={`n-intro-photo${index === active ? " is-active" : ""}`}
-            src={src}
-            alt={alt}
-            loading={index === 0 ? "eager" : "lazy"}
-            fetchPriority={index === 0 ? "high" : "auto"}
-          />
+            type="button"
+            className={`n-gallery-image${index === active ? " is-active" : ""}`}
+            onClick={() => { window.location.hash = "order-form"; }}
+            aria-label={`${alt} - اطلبي الآن`}
+          >
+            <img
+              className="n-intro-photo"
+              src={src}
+              alt={alt}
+              loading={index === 0 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "auto"}
+            />
+          </button>
         ))}
       </div>
       <button type="button" className="n-gallery-prev" aria-label="الصورة السابقة" onClick={() => move(-1)}>‹</button>

@@ -928,8 +928,9 @@
   display: flex;
   overflow: hidden;
 }
-.n-hero-gallery-track img { flex: 0 0 100%; opacity: 0; transform: translateX(0); display: none; transition: opacity .35s ease; }
-.n-hero-gallery-track img.is-active { display: block; opacity: 1; }
+.n-gallery-image { flex: 0 0 100%; display: none; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.n-gallery-image.is-active { display: block; }
+.n-gallery-image .n-intro-photo { opacity: 1; transition: opacity .35s ease; }
 .n-hero-gallery button {
   position: absolute;
   top: 50%;

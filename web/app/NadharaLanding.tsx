@@ -92,7 +92,7 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
             <div className="n-hero-benefit">🚚 توصيل مجاني لجميع محافظات العراق</div>
             <div className="n-product-links">
               <a className="n-hero-cta" href="#order-form">اطلبي البكج</a>
-              <a href="#reviews">تجارب الزبونات</a>
+              <a href="#order-form">اطلبي الآن</a>
             </div>
           </div>
         </section>
@@ -231,20 +231,6 @@ export default function LandingPage({ searchParams }: { searchParams?: { package
         </div>
         <div className="n-before-after">
           <video src="/videos/before-after.mp4" controls playsInline preload="none" />
-        </div>
-      </section>
-
-      <section className="n-section">
-        <div className="n-section-title">
-          <h2 id="reviews">آراء وتجارب الزبونات</h2>
-          <p>آراء حقيقية من زبونات استخدمن بكج نضارة</p>
-        </div>
-        <div className="n-testimonials n-testimonials-img">
-          <img src="/images/testimonials/t1.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
-          <img src="/images/testimonials/t2.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
-          <img src="/images/testimonials/t3.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
-          <img src="/images/testimonials/t4.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
-          <img src="/images/testimonials/t5.jpg" alt="تجربة زبونة مع بكج نضارة" loading="lazy" />
         </div>
       </section>
 
