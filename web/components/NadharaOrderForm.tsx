@@ -78,7 +78,6 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         address: String(data.get("address") ?? ""),
         quantity: Number(data.get("quantity") ?? 1),
         couponCode: String(data.get("couponCode") ?? "").trim() || undefined,
-        notes: String(data.get("notes") ?? "") || undefined,
         fbp,
         fbc,
         scid,
