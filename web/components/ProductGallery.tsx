@@ -26,7 +26,7 @@ export default function ProductGallery() {
   }, []);
 
   return (
-    <figure className="n-hero-gallery" aria-label="صور المنتج وتجارب الزبائن">
+    <figure className="n-hero-gallery" aria-label="معرض صور المنتج">
       <div className="n-hero-gallery-track" dir="ltr" tabIndex={0} aria-label="اسحبي يمينًا أو يسارًا لتصفح صور المنتج والتجارب">
         {GALLERY_IMAGES.map(([src, alt], index) => (
           <button
