@@ -9,7 +9,7 @@ export default function Home() {
         <a className="n-topbar-link" href="/products">المنتجات</a>
       </header>
       <section className="n-intro n-home-intro" aria-labelledby="home-title">
-        <img className="n-intro-photo" src="/images/nadhara-home-hero.png" alt="مجموعة نضارة للعناية" fetchPriority="high" />
+        <img className="n-intro-photo" src="/images/nadhara-home-hero.png?v=2" alt="مجموعة نضارة للعناية" fetchPriority="high" />
         <div className="n-home-copy">
           <span className="n-hero-badge">نضارة للعناية</span>
           <h1 id="home-title">روتين عناية يبدأ مع نضارة</h1>
