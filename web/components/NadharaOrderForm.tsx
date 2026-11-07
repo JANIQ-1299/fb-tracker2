@@ -117,17 +117,6 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         className="n-hp"
       />
 
-      <div className="n-field n-field-wide n-quantity-stepper">
-        <span>عدد البكجات المدفوعة</span>
-        <div className="n-stepper-controls" dir="ltr">
-          <button type="button" aria-label="زيادة البكجات" onClick={() => setSelectedQty((q) => Math.min(20, q + 1))}>+</button>
-          <strong>{selectedQty}</strong>
-          <button type="button" aria-label="تقليل البكجات" disabled={selectedQty <= 1} onClick={() => setSelectedQty((q) => Math.max(1, q - 1))}>−</button>
-        </div>
-        <small className="n-bundle-gift">{freeQty ? `🎁 تحصلين على ${freeQty} بكج مجاني — الإجمالي للتوصيل: ${selectedQty + freeQty}` : "اطلبي بكجين لتحصلي على الثالث مجانًا"}</small>
-        <input type="hidden" name="quantity" value={selectedQty} />
-      </div>
-
       <div className="n-price-line n-field-wide" aria-live="polite">
         <span>السعر الإجمالي</span>
         <strong>{displayedPriceLabel}</strong>
@@ -172,10 +161,16 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         <textarea name="address" required minLength={5} maxLength={500} rows={2} />
       </label>
 
-      <label className="n-field n-field-wide">
-        <span>ملاحظات (اختياري)</span>
-        <textarea name="notes" maxLength={500} rows={2} />
-      </label>
+      <div className="n-field n-field-wide n-quantity-stepper">
+        <span>عدد البكجات المدفوعة</span>
+        <div className="n-stepper-controls" dir="ltr">
+          <button type="button" aria-label="زيادة البكجات" onClick={() => setSelectedQty((q) => Math.min(20, q + 1))}>+</button>
+          <strong>{selectedQty}</strong>
+          <button type="button" aria-label="تقليل البكجات" disabled={selectedQty <= 1} onClick={() => setSelectedQty((q) => Math.max(1, q - 1))}>−</button>
+        </div>
+        <small className="n-bundle-gift">{freeQty ? `🎁 تحصلين على ${freeQty} بكج مجاني — الإجمالي للتوصيل: ${selectedQty + freeQty}` : "اطلبي بكجين لتحصلي على الثالث مجانًا"}</small>
+        <input type="hidden" name="quantity" value={selectedQty} />
+      </div>
 
       {status === "error" && <p className="n-form-error">{errorMessage}</p>}
 
