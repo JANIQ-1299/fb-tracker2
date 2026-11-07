@@ -6,16 +6,16 @@
      دومًا، بدل اتّباع الوضع الداكن للجهاز - يمنع أي تباين لوني غير مقصود مع ألوان الصفحة الثابتة. */
   color-scheme: light;
 
-  --n-bg: #f8f2e9;
+  --n-bg: #fff9f3;
   --n-surface: #fffdf9;
-  --n-pink: #9a4862;
-  --n-pink-dark: #712b45;
-  --n-pink-light: #f1dfe3;
-  --n-pink-lighter: #fbf2f2;
-  --n-gold: #9a733e;
-  --n-text: #37232b;
-  --n-text-dim: #6c505a;
-  --n-border: #e6d1cf;
+  --n-pink: #a64d6d;
+  --n-pink-dark: #762b49;
+  --n-pink-light: #f3dde3;
+  --n-pink-lighter: #fff4f5;
+  --n-gold: #b58a55;
+  --n-text: #3c2730;
+  --n-text-dim: #745761;
+  --n-border: #ead5d5;
   --n-radius: 18px;
 
   direction: rtl;
@@ -822,7 +822,7 @@
 .n-intro-photo { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
 .n-intro-product h1 { font-size: clamp(20px, 3vw, 34px); line-height: 1.35; margin: 8px 0; }
 .n-intro-product p { margin: 0 0 8px; }
-.n-intro-product strong { color: #852848; }
+.n-intro-product strong { color: var(--n-pink-dark); }
 .n-intro .n-order { width: 100%; max-width: none; padding: 0; margin: 0; }
 
 @media (max-width: 640px) {
@@ -835,37 +835,37 @@
 
 /* Boutique palette and typography for the public landing page. */
 .n-intro-product {
-  background: #faf3ee;
-  border: 1px solid #e9d8cd;
+  background: var(--n-surface);
+  border: 1px solid var(--n-border);
   border-radius: 18px;
-  color: #42242b;
+  color: var(--n-text);
 }
 .n-intro-product h1 { font-weight: 750; letter-spacing: normal; }
 .n-intro-product .n-hero-badge {
   background: transparent;
-  color: #78354b;
+  color: var(--n-pink-dark);
   padding: 0;
   border: 0;
   font-size: 13px;
 }
-.n-intro-product strong { display: inline-block; padding-block: 4px; color: #78354b; }
+.n-intro-product strong { display: inline-block; padding-block: 4px; color: var(--n-pink-dark); }
 .n-intro .n-order-card {
   background: #fffdf9;
-  border: 1px solid #e9d8cd;
+  border: 1px solid var(--n-border);
   border-radius: 18px;
   box-shadow: 0 12px 30px #492a3410;
 }
 .n-intro .n-order-card h2 { color: #542838; }
 .n-intro .n-order-card :is(input, select, textarea) { border-color: #dcc9c3; }
-.n-intro .n-order-card button[type="submit"] { background: #712b45; color: #fff; }
+.n-intro .n-order-card button[type="submit"] { background: var(--n-pink-dark); color: #fff; }
 .n-intro .n-order-card button[type="submit"]:focus-visible { outline: 3px solid #a65a72; outline-offset: 3px; }
 
-.n-intro-product { background: #fffaf5; }
+.n-intro-product { background: var(--n-surface); }
 .n-intro-product > div { padding: clamp(16px, 4vw, 28px); }
 .n-intro-photo { background: #f6e6e4; }
 .n-offer { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-top: 12px; }
 .n-offer strong { font-size: 23px; }
-.n-offer span { font-size: 13px; color: #634a50; }
+.n-offer span { font-size: 13px; color: var(--n-text-dim); }
 .n-hero-summary { color: var(--n-text-dim); line-height: 1.8; }
 .n-pieces { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 12px 0; color: var(--n-pink-dark); font-size: 13px; font-weight: 700; }
 .n-pieces span { padding: 5px 9px; border: 1px solid var(--n-border); border-radius: 999px; background: #fff; }
