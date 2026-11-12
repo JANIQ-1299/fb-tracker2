@@ -78,10 +78,11 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         address: String(data.get("address") ?? ""),
         quantity: Number(data.get("quantity") ?? 1),
         couponCode: String(data.get("couponCode") ?? "").trim() || undefined,
-        fbp,
-        fbc,
-        scid,
-        scclid,
+        // كوكيز التتبع اختيارية؛ لا نسمح لقيمة تالفة/طويلة بمنع إرسال الطلب.
+        fbp: fbp && fbp.length <= 200 ? fbp : undefined,
+        fbc: fbc && fbc.length <= 200 ? fbc : undefined,
+        scid: scid && scid.length <= 200 ? scid : undefined,
+        scclid: scclid && scclid.length <= 300 ? scclid : undefined,
       });
       setStatus("success");
       trackPurchase(result.orderId, result.price);
