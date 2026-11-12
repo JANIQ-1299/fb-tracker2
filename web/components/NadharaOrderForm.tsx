@@ -157,7 +157,7 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
 
       <label className="n-field n-field-wide">
         <span>العنوان بالتفصيل (المنطقة، أقرب نقطة دالة)</span>
-        <textarea name="address" required minLength={5} maxLength={500} rows={2} />
+        <textarea name="address" required minLength={5} maxLength={200} rows={2} />
       </label>
 
       <div className="n-field n-field-wide n-quantity-stepper">

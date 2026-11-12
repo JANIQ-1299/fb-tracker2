@@ -13,7 +13,7 @@ const orderSchema = z.object({
   name: z.string().trim().min(2, "الاسم قصير جدًا").max(100),
   phone: z.string().trim().min(7, "رقم الهاتف غير صحيح").max(20),
   city: z.string().trim().min(2, "الرجاء تحديد المحافظة/المدينة").max(100),
-  address: z.string().trim().min(5, "الرجاء كتابة العنوان بالتفصيل").max(500),
+  address: z.string().trim().min(5, "الرجاء كتابة العنوان بالتفصيل").max(200, "العنوان يجب ألا يتجاوز 200 حرف"),
   quantity: z.coerce.number().int().min(1).max(20).default(1),
   couponCode: z.string().trim().max(40).optional(),
   notes: z.string().trim().max(500).optional(),
