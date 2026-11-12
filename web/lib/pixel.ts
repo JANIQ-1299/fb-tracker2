@@ -1,4 +1,4 @@
-export const META_PIXEL_ID = "2023190068308366";
+export const META_PIXEL_ID = "2430891910775005";
 export const SNAP_PIXEL_ID = "813791b7-c0f0-4f20-b092-ad4ba5e8234c";
 
 declare global {

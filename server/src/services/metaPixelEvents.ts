@@ -5,7 +5,7 @@ import { logger } from "../lib/logger.js";
 // Sends the same website Purchase event as the browser pixel.
 
 // يجب أن يطابق META_PIXEL_ID الثابت في web/lib/pixel.ts
-const PIXEL_ID = "2023190068308366";
+const PIXEL_ID = "2430891910775005";
 
 function sha256(value: string): string {
   return crypto.createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
