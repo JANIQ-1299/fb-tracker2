@@ -15,7 +15,8 @@ const loginSchema = z.object({
 authRouter.post("/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "بيانات دخول غير صالحة" });
-  const { email, password } = parsed.data;
+  const { password } = parsed.data;
+  const email = parsed.data.email.trim().toLowerCase();
 
   // مستخدم Admin واحد من .env (سريع للإعداد الأولي)، أو من جدول AdminUser إن وُجد
   let passwordHash = env.adminPasswordHash;

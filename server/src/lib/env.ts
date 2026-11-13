@@ -49,8 +49,8 @@ export const env = {
   metaAdAccountId: required("META_AD_ACCOUNT_ID"),
   metaConversionsDatasetId: required("META_CONVERSIONS_DATASET_ID"),
 
-  adminEmail: required("ADMIN_EMAIL"),
-  adminPasswordHash: required("ADMIN_PASSWORD_HASH"),
+  adminEmail: required("ADMIN_EMAIL").trim().toLowerCase(),
+  adminPasswordHash: required("ADMIN_PASSWORD_HASH").trim().replace(/^['"]|['"]$/g, ""),
   jwtSecret: required("JWT_SECRET", "dev-insecure-secret-change-me"),
 
   // ---- Multi-Tenant: تراخيص/اشتراكات + تشفير اتصال Meta ----
