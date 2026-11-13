@@ -16,7 +16,8 @@ export default function Nav() {
   const pathname = usePathname();
   return (
     <aside className="sidebar">
-      <h1>تتبع الطلبات - Meta</h1>
+      <div className="brand-mark">نضارة</div>
+      <p className="sidebar-caption">لوحة متابعة الطلبات والإعلانات</p>
       <nav>
         {links.map((l) => (
           <Link key={l.href} href={l.href} className={pathname === l.href ? "active" : ""}>

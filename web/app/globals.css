@@ -43,15 +43,22 @@ a {
   width: 220px;
   background: var(--surface);
   border-left: 1px solid var(--border);
-  padding: 20px 12px;
+  padding: 24px 14px;
   flex-shrink: 0;
 }
 
-.sidebar h1 {
-  font-size: 16px;
-  margin: 0 0 24px;
-  padding: 0 8px;
-  color: var(--primary);
+.brand-mark {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 8px 4px;
+  color: #f5b3c7;
+}
+
+.sidebar-caption {
+  color: var(--text-dim);
+  font-size: 11px;
+  margin: 0 8px 28px;
+  line-height: 1.6;
 }
 
 .sidebar nav a {
@@ -74,11 +81,43 @@ a {
   padding: 24px 32px;
   max-width: 100%;
   overflow-x: auto;
+  background: radial-gradient(circle at 100% 0, rgba(79,124,255,.08), transparent 35%);
 }
 
 .page-title {
-  font-size: 22px;
-  margin: 0 0 20px;
+  font-size: 26px;
+  margin: 0;
+}
+
+.dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  color: #f5b3c7;
+  font-size: 12px;
+  margin: 0 0 6px;
+}
+
+.page-subtitle {
+  color: var(--text-dim);
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.filter-label {
+  color: var(--text-dim);
+  font-size: 13px;
+  align-self: center;
+}
+
+.section-title {
+  font-size: 17px;
+  margin: 4px 0 14px;
 }
 
 .cards {
@@ -93,7 +132,13 @@ a {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
 }
+
+.kpi-cards .card:nth-child(2) { border-color: rgba(46,204,143,.4); }
+.kpi-cards .card:nth-child(7) { border-color: rgba(242,177,52,.4); }
+
+.highlight-cards .card { min-height: 112px; }
 
 .card .label {
   color: var(--text-dim);
@@ -247,5 +292,22 @@ textarea {
   border-radius: 8px;
   object-fit: cover;
   background: var(--surface-2);
+}
+
+@media (max-width: 720px) {
+  .layout { display: block; }
+  .sidebar { width: 100%; padding: 14px 12px; border-left: 0; border-bottom: 1px solid var(--border); }
+  .brand-mark { display: inline-block; margin-bottom: 0; }
+  .sidebar-caption { display: inline-block; margin: 0 10px 0 0; }
+  .sidebar nav { display: flex; gap: 6px; overflow-x: auto; padding-top: 12px; }
+  .sidebar nav a { white-space: nowrap; margin: 0; padding: 8px 10px; font-size: 12px; }
+  .main { padding: 20px 14px; }
+  .dashboard-heading { align-items: flex-start; flex-direction: column; }
+  .dashboard-heading .btn { width: 100%; text-align: center; }
+  .page-title { font-size: 23px; }
+  .cards { gap: 10px; }
+  .kpi-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .kpi-cards .card { padding: 13px; }
+  .card .value { font-size: 20px; }
 }
 

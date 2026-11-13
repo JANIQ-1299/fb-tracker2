@@ -67,8 +67,16 @@ export default function DashboardHome() {
 
   return (
     <div>
-      <h2 className="page-title">نظرة عامة</h2>
-      <div className="filters">
+      <div className="dashboard-heading">
+        <div>
+          <p className="eyebrow">لوحة نضارة</p>
+          <h2 className="page-title">نظرة عامة</h2>
+          <p className="page-subtitle">تابع الطلبات وأداء الحملات من مكان واحد.</p>
+        </div>
+        <a className="btn" href="/dashboard/leads">عرض الطلبات</a>
+      </div>
+      <div className="filters range-filters">
+        <span className="filter-label">الفترة:</span>
         {RANGES.map((r) => (
           <button
             key={r.key}
@@ -84,7 +92,7 @@ export default function DashboardHome() {
         <p>جارٍ التحميل...</p>
       ) : (
         <>
-          <div className="cards">
+          <div className="cards kpi-cards">
             <Card label="إجمالي العملاء المحتملين" value={summary.totalLeads} />
             <Card label="تم تقديم الطلب" value={summary.ordersCount} />
             <Card label="نسبة التحويل" value={`${summary.conversionRate}%`} />
@@ -95,7 +103,8 @@ export default function DashboardHome() {
             <Card label="عملاء مكررون" value={summary.duplicateCount} />
           </div>
 
-          <div className="cards" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+          <h3 className="section-title">أداء الإعلانات</h3>
+          <div className="cards highlight-cards">
             <BestWorstCard title="أفضل إعلان" item={summary.bestAd} field="adName" />
             <BestWorstCard title="أسوأ إعلان" item={summary.worstAd} field="adName" />
             <BestWorstCard title="أفضل فيديو" item={summary.bestVideo} field="videoId" />
