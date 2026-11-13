@@ -3,11 +3,16 @@ import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { logger } from "../lib/logger.js";
-import { appendOrderToCsv, freeQuantityForQuantity, priceForQuantity, sendOrderToTelegram } from "../services/telegramOrders.js";
+import { appendOrderToCsv, freeQuantityForQuantity, listNadharaOrders, priceForQuantity, sendOrderToTelegram } from "../services/telegramOrders.js";
+import { requireAdmin } from "../middleware/auth.js";
 
 // نقطة نهاية عامة بلا مصادقة لاستقبال طلبات نموذج صفحة هبوط نضارة (web/app/page.tsx).
 // مستقلة تمامًا عن مخطط Lead/Order متعدد المستأجرين - راجع services/telegramOrders.ts.
 export const nadharaOrdersRouter = Router();
+
+nadharaOrdersRouter.get("/", requireAdmin, (_req, res) => {
+  res.json({ items: listNadharaOrders() });
+});
 
 const orderSchema = z.object({
   name: z.string().trim().min(2, "الاسم قصير جدًا").max(100),

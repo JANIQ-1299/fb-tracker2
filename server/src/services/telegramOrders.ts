@@ -73,6 +73,12 @@ function readOrdersStore(): Record<string, PendingOrder> {
   }
 }
 
+export function listNadharaOrders() {
+  return Object.values(readOrdersStore()).sort((a, b) =>
+    String(b.receivedAt).localeCompare(String(a.receivedAt)),
+  );
+}
+
 function writeOrdersStore(store: Record<string, PendingOrder>) {
   ensureDataDir();
   fs.writeFileSync(ORDERS_STORE_PATH, JSON.stringify(store, null, 2));
