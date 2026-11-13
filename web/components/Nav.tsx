@@ -8,7 +8,7 @@ const links = [
   { href: "/dashboard/last-24h", label: "آخر 24 ساعة" },
   { href: "/dashboard/ads", label: "تقرير الإعلانات" },
   { href: "/dashboard/videos", label: "تقرير الفيديوهات" },
-  { href: "/dashboard/leads", label: "العملاء" },
+  { href: "/dashboard/leads", label: "الطلبات" },
   { href: "/dashboard/settings", label: "الإعدادات" },
 ];
 

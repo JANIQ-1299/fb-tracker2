@@ -63,7 +63,7 @@ export default function LeadsPage() {
 
   return (
     <div>
-      <h2 className="page-title">العملاء ({total})</h2>
+      <h2 className="page-title">الطلبات ({total})</h2>
       <div className="filters">
         <input placeholder="بحث بالاسم أو الهاتف أو البريد" value={search} onChange={(e) => setSearch(e.target.value)} />
         <select value={status} onChange={(e) => setStatus(e.target.value)}>
