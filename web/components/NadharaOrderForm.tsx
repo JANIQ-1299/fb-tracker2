@@ -77,7 +77,7 @@ export default function NadharaOrderForm({ initialQuantity }: { initialQuantity:
         city: String(data.get("city") ?? ""),
         address: String(data.get("address") ?? ""),
         quantity: Number(data.get("quantity") ?? 1),
-        couponCode: String(data.get("couponCode") ?? "").trim() || undefined,
+        couponCode: couponCode.trim() || undefined,
         // كوكيز التتبع اختيارية؛ لا نسمح لقيمة تالفة/طويلة بمنع إرسال الطلب.
         fbp: fbp && fbp.length <= 200 ? fbp : undefined,
         fbc: fbc && fbc.length <= 200 ? fbc : undefined,
